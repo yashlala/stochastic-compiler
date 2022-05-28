@@ -29,8 +29,7 @@ public class StochasticISATests {
         instructions.add(sdiv);
 
         StochasticExp sexp = new StochasticExp(new StochasticRegister("sexpDest", getPolarity(counter), ++counter),
-                new StochasticRegister("sexpSrc1", getPolarity(counter), ++counter),
-                new StochasticRegister("sexpSrc2", getPolarity(counter), ++counter));
+                new StochasticRegister("sexpSrc1", getPolarity(counter), ++counter));
         System.out.println(sexp);
         instructions.add(sexp);
 
@@ -47,8 +46,7 @@ public class StochasticISATests {
         instructions.add(ssub);
 
         StochasticTanh stan = new StochasticTanh(new StochasticRegister("stanDest", getPolarity(counter), ++counter),
-                new StochasticRegister("stanSrc1", getPolarity(counter), ++counter),
-                new StochasticRegister("stanSrc2", getPolarity(counter), ++counter));
+                new StochasticRegister("stanSrc1", getPolarity(counter), ++counter));
         System.out.println(stan);
         instructions.add(stan);
 

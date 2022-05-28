@@ -13,8 +13,6 @@ public class StochasticExp implements InstructionNode {
     private final StochasticRegister dest;
     @NonNull
     private final StochasticRegister src1;
-    @NonNull
-    private final StochasticRegister src2;
 
     @Override
     public void accept(ISAVisitor visitor) {
@@ -23,6 +21,6 @@ public class StochasticExp implements InstructionNode {
 
     @Override
     public String toString() {
-        return "exp " + dest + ", " + src1 + ", " + src2;
+        return "exp " + dest + ", " + src1;
     }
 }
