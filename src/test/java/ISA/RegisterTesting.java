@@ -4,7 +4,7 @@ import ISA.Registers.BinaryRegister;
 import ISA.Registers.RegisterPolarity;
 import ISA.Registers.StochasticRegister;
 
-public class Testing {
+public class RegisterTesting {
     public static void main(String[] args) {
         BinaryRegister testBinaryReg = new BinaryRegister("testBinary");
         StochasticRegister testUnipolar = new StochasticRegister("unipolar", RegisterPolarity.UNIPOLAR, 190);
