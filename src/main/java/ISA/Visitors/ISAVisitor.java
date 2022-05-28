@@ -34,4 +34,10 @@ public interface ISAVisitor {
     void visit(StochasticExp stochasticExp);
 
     void visit(StochasticTanh stochasticTanh);
+
+    void visit(PrintIns printIns);
+
+    void visit(LoadIns loadIns);
+
+    void visit(StoreIns storeIns);
 }

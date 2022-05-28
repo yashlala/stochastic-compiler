@@ -81,4 +81,19 @@ public class PrintVisitor implements ISAVisitor{
     public void visit(StochasticTanh stochasticTanh) {
         System.out.println(stochasticTanh);
     }
+
+    @Override
+    public void visit(PrintIns printIns) {
+        System.out.println(printIns);
+    }
+
+    @Override
+    public void visit(LoadIns loadIns) {
+        System.out.println(loadIns);
+    }
+
+    @Override
+    public void visit(StoreIns storeIns) {
+        System.out.println(storeIns);
+    }
 }
