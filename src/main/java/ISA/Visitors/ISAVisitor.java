@@ -22,4 +22,16 @@ public interface ISAVisitor {
     void visit(LabelNode labelNode);
 
     void visit(BinaryJump binaryJump);
+
+    void visit(StochasticAdd stochasticAdd);
+
+    void visit(StochasticSub stochasticSub);
+
+    void visit(StochasticMul stochasticMul);
+
+    void visit(StochasticDiv stochasticDiv);
+
+    void visit(StochasticExp stochasticExp);
+
+    void visit(StochasticTanh stochasticTanh);
 }
