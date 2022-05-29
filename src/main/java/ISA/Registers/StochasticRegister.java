@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
+import java.util.Objects;
+
 @Getter
 @RequiredArgsConstructor
 public class StochasticRegister implements Register {
@@ -21,5 +23,18 @@ public class StochasticRegister implements Register {
     @Override
     public String toString() {
         return name + "[" + polarityNames.get(polarity) + width + "]";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        StochasticRegister that = (StochasticRegister) o;
+        return getWidth() == that.getWidth() && getName().equals(that.getName()) && getPolarity() == that.getPolarity();
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getName(), getPolarity(), getWidth());
     }
 }
