@@ -2,10 +2,10 @@ package IR.Visitors;
 
 import IR.IRNodes.*;
 
-import java.util.Collection;
+import java.util.List;
 
 public interface IRVisitor {
-    void visitAllInstructions(Collection<IRNode> instructions);
+    void visitAllInstructions(List<IRNode> instructions);
 
     void visit(ForLoop forLoop);
 

@@ -2,10 +2,10 @@ package ISA.Visitors;
 
 import ISA.InstructionNodes.*;
 
-import java.util.Collection;
+import java.util.List;
 
 public interface ISAVisitor {
-    void visitAllInstructions(Collection<InstructionNode> instructions);
+    void visitAllInstructions(List<InstructionNode> instructions);
 
     void visit(BinaryAdd binaryAdd);
 

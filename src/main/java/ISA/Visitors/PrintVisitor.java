@@ -2,13 +2,13 @@ package ISA.Visitors;
 
 import ISA.InstructionNodes.*;
 
-import java.util.Collection;
+import java.util.List;
 
 public class PrintVisitor implements ISAVisitor{
 
 
     @Override
-    public void visitAllInstructions(Collection<InstructionNode> instructions) {
+    public void visitAllInstructions(List<InstructionNode> instructions) {
         instructions.forEach(ins -> ins.accept(this));
     }
 

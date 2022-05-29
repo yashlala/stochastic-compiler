@@ -2,11 +2,11 @@ package IR.Visitors;
 
 import IR.IRNodes.*;
 
-import java.util.Collection;
+import java.util.List;
 
 public class PrintVisitor implements IRVisitor{
     @Override
-    public void visitAllInstructions(Collection<IRNode> instructions) {
+    public void visitAllInstructions(List<IRNode> instructions) {
         instructions.forEach(System.out::println);
     }
 
