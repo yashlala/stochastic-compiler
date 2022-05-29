@@ -33,7 +33,7 @@ public class PrintVisitor implements ISAVisitor{
     }
 
     @Override
-    public void visit(BinaryLessThan binaryLessThan) {
+    public void visit(LessThan binaryLessThan) {
         System.out.println(binaryLessThan);
     }
 

@@ -1,9 +1,6 @@
 package ISA;
 
-import ISA.InstructionNodes.InstructionNode;
-import ISA.InstructionNodes.LoadIns;
-import ISA.InstructionNodes.PrintIns;
-import ISA.InstructionNodes.StoreIns;
+import ISA.InstructionNodes.*;
 import ISA.Memory.MemoryAddress;
 import ISA.Registers.BinaryRegister;
 import ISA.Registers.RegisterPolarity;
@@ -59,6 +56,11 @@ public class CombinedISATests {
                 new MemoryAddress(++counter));
         System.out.println(sB);
         instructions.add(sB);
+
+        LessThan lt = new LessThan(new BinaryRegister("ltDest"), new BinaryRegister("ltSrc1"),
+                new BinaryRegister("ltSrc2"));
+        System.out.println(lt);
+        instructions.add(lt);
 
         System.out.println("--------------------VISITOR PRINTS------------------");
         PrintVisitor visitor = new PrintVisitor();

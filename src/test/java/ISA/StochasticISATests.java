@@ -1,8 +1,6 @@
 package ISA;
 
 import ISA.InstructionNodes.*;
-import ISA.Labels.Label;
-import ISA.Registers.BinaryRegister;
 import ISA.Registers.RegisterPolarity;
 import ISA.Registers.StochasticRegister;
 import ISA.Visitors.PrintVisitor;
@@ -18,7 +16,8 @@ public class StochasticISATests {
 
         StochasticAdd sadd = new StochasticAdd(new StochasticRegister("saddDest", getPolarity(counter), ++counter),
                 new StochasticRegister("saddSrc1", getPolarity(counter), ++counter),
-                new StochasticRegister("saddSrc2", getPolarity(counter), ++counter));
+                new StochasticRegister("saddSrc2", getPolarity(counter), ++counter),
+                new StochasticRegister("saddScale", getPolarity(counter), ++counter));
         System.out.println(sadd);
         instructions.add(sadd);
 
@@ -41,7 +40,8 @@ public class StochasticISATests {
 
         StochasticSub ssub = new StochasticSub(new StochasticRegister("ssubDest", getPolarity(counter), ++counter),
                 new StochasticRegister("ssubSrc1", getPolarity(counter), ++counter),
-                new StochasticRegister("ssubSrc2", getPolarity(counter), ++counter));
+                new StochasticRegister("ssubSrc2", getPolarity(counter), ++counter),
+                new StochasticRegister("ssubScale", getPolarity(counter), ++counter));
         System.out.println(ssub);
         instructions.add(ssub);
 

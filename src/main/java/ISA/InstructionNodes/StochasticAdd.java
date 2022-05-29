@@ -1,6 +1,7 @@
 package ISA.InstructionNodes;
 
 import ISA.Registers.BinaryRegister;
+import ISA.Registers.Register;
 import ISA.Registers.StochasticRegister;
 import ISA.Visitors.ISAVisitor;
 import lombok.Getter;
@@ -16,6 +17,8 @@ public class StochasticAdd implements InstructionNode {
     private final StochasticRegister src1;
     @NonNull
     private final StochasticRegister src2;
+    @NonNull
+    private final Register scale;
 
     @Override
     public void accept(ISAVisitor visitor) {
@@ -24,6 +27,6 @@ public class StochasticAdd implements InstructionNode {
 
     @Override
     public String toString() {
-        return "add " + dest + ", " + src1 + ", " + src2;
+        return "add " + dest + ", " + src1 + ", " + src2 + ", " + scale;
     }
 }

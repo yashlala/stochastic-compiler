@@ -15,7 +15,7 @@ public interface ISAVisitor {
 
     void visit(BinaryDiv binaryDiv);
 
-    void visit(BinaryLessThan binaryLessThan);
+    void visit(LessThan binaryLessThan);
 
     void visit(BinaryEq binaryEq);
 

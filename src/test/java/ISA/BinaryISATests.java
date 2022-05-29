@@ -31,11 +31,6 @@ public class BinaryISATests {
         System.out.println(j);
         instructions.add(j);
 
-        BinaryLessThan lt = new BinaryLessThan(new BinaryRegister("ltDest"), new BinaryRegister("ltSrc1"),
-                new BinaryRegister("ltSrc2"));
-        System.out.println(lt);
-        instructions.add(lt);
-
         BinaryMul mul = new BinaryMul(new BinaryRegister("mulDest"), new BinaryRegister("mulSrc1"),
                 new BinaryRegister("mulSrc2"));
         System.out.println(mul);

@@ -1,6 +1,7 @@
 package ISA.InstructionNodes;
 
 import ISA.Registers.BinaryRegister;
+import ISA.Registers.Register;
 import ISA.Visitors.ISAVisitor;
 import lombok.Getter;
 import lombok.NonNull;
@@ -8,13 +9,13 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public class BinaryLessThan implements InstructionNode{
+public class LessThan implements InstructionNode{
     @NonNull
-    private final BinaryRegister dest;
+    private final Register dest;
     @NonNull
-    private final BinaryRegister src1;
+    private final Register src1;
     @NonNull
-    private final BinaryRegister src2;
+    private final Register src2;
 
     @Override
     public void accept(ISAVisitor visitor) {
