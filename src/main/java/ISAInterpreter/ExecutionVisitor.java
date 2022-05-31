@@ -2,16 +2,18 @@ package ISAInterpreter;
 
 import ISA.InstructionNodes.*;
 import ISA.Visitors.ISAVisitor;
+import ISAInterpreter.Registers.BinaryRegister;
+import ISAInterpreter.Registers.Register;
 
 import java.util.List;
 
 public class ExecutionVisitor implements ISAVisitor {
-    private final RegisterFile registerFile = new RegisterFile();
+    private final RegisterFile regFile = new RegisterFile();
     private final ExecutionEngine executionEngine = new ExecutionEngine();
 
     @Override
     public void visitAllInstructions(List<InstructionNode> instructions) {
-        registerFile.clear();
+        regFile.clear();
         for (InstructionNode i : instructions) {
             i.accept(this);
         }
@@ -19,32 +21,60 @@ public class ExecutionVisitor implements ISAVisitor {
 
     @Override
     public void visit(BinaryAdd binaryAdd) {
-
+        BinaryRegister src1 = regFile.getBinaryReg(binaryAdd.getSrc1());
+        BinaryRegister src2 = regFile.getBinaryReg(binaryAdd.getSrc2());
+        String destName = binaryAdd.getDest().getName();
+        int destValue = src1.getValue() + src2.getValue();
+        regFile.setBinaryReg(new BinaryRegister(destName, destValue));
     }
 
     @Override
     public void visit(BinarySub binarySub) {
-
+        BinaryRegister src1 = regFile.getBinaryReg(binarySub.getSrc1());
+        BinaryRegister src2 = regFile.getBinaryReg(binarySub.getSrc2());
+        String destName = binarySub.getDest().getName();
+        int destValue = src1.getValue() - src2.getValue();
+        regFile.setBinaryReg(new BinaryRegister(destName, destValue));
     }
 
     @Override
     public void visit(BinaryMul binaryMul) {
-
+        BinaryRegister src1 = regFile.getBinaryReg(binaryMul.getSrc1());
+        BinaryRegister src2 = regFile.getBinaryReg(binaryMul.getSrc2());
+        String destName = binaryMul.getDest().getName();
+        int destValue = src1.getValue() * src2.getValue();
+        regFile.setBinaryReg(new BinaryRegister(destName, destValue));
     }
 
     @Override
     public void visit(BinaryDiv binaryDiv) {
-
+        BinaryRegister src1 = regFile.getBinaryReg(binaryDiv.getSrc1());
+        BinaryRegister src2 = regFile.getBinaryReg(binaryDiv.getSrc2());
+        String destName = binaryDiv.getDest().getName();
+        int destValue = src1.getValue() / src2.getValue();
+        regFile.setBinaryReg(new BinaryRegister(destName, destValue));
     }
 
     @Override
-    public void visit(LessThan binaryLessThan) {
+    public void visit(LessThan lessThan) {
+        // This method can deal with both stochastic and binary inputs.
+        // But it always outputs a binary output.
 
+        // TODO
     }
 
     @Override
     public void visit(BinaryEq binaryEq) {
-
+        BinaryRegister src1 = regFile.getBinaryReg(binaryEq.getSrc1());
+        BinaryRegister src2 = regFile.getBinaryReg(binaryEq.getSrc2());
+        String destName = binaryEq.getDest().getName();
+        int destValue;
+        if (src1.getValue() == src2.getValue()) {
+            destValue = 1;
+        } else {
+            destValue = 0;
+        }
+        regFile.setBinaryReg(new BinaryRegister(destName, destValue));
     }
 
     @Override
@@ -54,7 +84,11 @@ public class ExecutionVisitor implements ISAVisitor {
 
     @Override
     public void visit(BinaryJz binaryJz) {
-
+        BinaryRegister conditionReg = regFile.getBinaryReg(binaryJz.getConditionReg());
+        if (conditionReg.getValue() == 0) {
+            // TODO: Jump!
+            ;
+        }
     }
 
     @Override

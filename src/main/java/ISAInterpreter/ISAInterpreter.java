@@ -12,7 +12,7 @@ import java.util.List;
 public class ISAInterpreter {
     // Should this return a list of things to print? That would avoid side effects from printing directly.
     public static void executeProgram(List<InstructionNode> instructions)  {
-        var executionVisitor = new ExecutionVisitor();
+        ExecutionVisitor executionVisitor = new ExecutionVisitor();
         executionVisitor.visitAllInstructions(instructions);
     }
 }
