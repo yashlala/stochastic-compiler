@@ -8,7 +8,7 @@ import java.util.Objects;
 
 @RequiredArgsConstructor
 @Getter
-public class BinaryRegister implements Register{
+public class BinaryRegister implements Register {
     @NonNull
     private final String name;
 

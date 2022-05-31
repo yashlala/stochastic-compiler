@@ -16,7 +16,6 @@ public class BinaryJz implements InstructionNode{
     @NonNull
     private final BinaryRegister conditionReg;
 
-
     @Override
     public void accept(ISAVisitor visitor) {
         visitor.visit(this);
