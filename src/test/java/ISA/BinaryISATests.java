@@ -27,7 +27,7 @@ public class BinaryISATests {
         System.out.println(eq);
         instructions.add(eq);
 
-        BinaryJump j = new BinaryJump(new Label("jlabel"), new BinaryRegister("jCond"));
+        BinaryJz j = new BinaryJz(new Label("jlabel"), new BinaryRegister("jCond"));
         System.out.println(j);
         instructions.add(j);
 

@@ -48,8 +48,8 @@ public class PrintVisitor implements ISAVisitor{
     }
 
     @Override
-    public void visit(BinaryJump binaryJump) {
-        System.out.println(binaryJump);
+    public void visit(BinaryJz binaryJz) {
+        System.out.println(binaryJz);
     }
 
     @Override

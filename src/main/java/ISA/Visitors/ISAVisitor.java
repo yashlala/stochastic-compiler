@@ -21,7 +21,7 @@ public interface ISAVisitor {
 
     void visit(LabelNode labelNode);
 
-    void visit(BinaryJump binaryJump);
+    void visit(BinaryJz binaryJz);
 
     void visit(StochasticAdd stochasticAdd);
 
