@@ -16,6 +16,9 @@ public class StochasticMul implements InstructionNode {
     @NonNull
     private final StochasticRegister src2;
 
+    @NonNull
+    private final StochasticRegister scale;
+
     @Override
     public void accept(ISAVisitor visitor) {
         visitor.visit(this);
@@ -23,6 +26,6 @@ public class StochasticMul implements InstructionNode {
 
     @Override
     public String toString() {
-        return "mul " + dest + ", " + src1 + ", " + src2;
+        return "mul " + dest + ", " + src1 + ", " + src2 + ", "  + scale;
     }
 }
