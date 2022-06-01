@@ -40,4 +40,6 @@ public interface ISAVisitor {
     void visit(LoadIns loadIns);
 
     void visit(StoreIns storeIns);
+
+    void visit(LoadLiteralIns loadLiteralIns);
 }
