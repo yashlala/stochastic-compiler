@@ -135,4 +135,9 @@ public class ExecutionVisitor implements ISAVisitor {
     public void visit(StoreIns storeIns) {
 
     }
+
+    @Override
+    public void visit(LoadLiteralIns loadLiteralIns) {
+
+    }
 }

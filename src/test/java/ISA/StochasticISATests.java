@@ -23,7 +23,8 @@ public class StochasticISATests {
 
         StochasticDiv sdiv = new StochasticDiv(new StochasticRegister("sdivDest", getPolarity(counter), ++counter),
                 new StochasticRegister("sdivSrc1", getPolarity(counter), ++counter),
-                new StochasticRegister("sdivSrc2", getPolarity(counter), ++counter));
+                new StochasticRegister("sdivSrc2", getPolarity(counter), ++counter),
+                new StochasticRegister("sdivScale", getPolarity(counter), ++counter));
         System.out.println(sdiv);
         instructions.add(sdiv);
 
@@ -34,7 +35,8 @@ public class StochasticISATests {
 
         StochasticMul smul = new StochasticMul(new StochasticRegister("smulDest", getPolarity(counter), ++counter),
                 new StochasticRegister("smulSrc1", getPolarity(counter), ++counter),
-                new StochasticRegister("smulSrc2", getPolarity(counter), ++counter));
+                new StochasticRegister("smulSrc2", getPolarity(counter), ++counter),
+                new StochasticRegister("smulScale", getPolarity(counter), ++counter));
         System.out.println(smul);
         instructions.add(smul);
 

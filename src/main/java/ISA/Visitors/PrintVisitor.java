@@ -96,4 +96,9 @@ public class PrintVisitor implements ISAVisitor{
     public void visit(StoreIns storeIns) {
         System.out.println(storeIns);
     }
+
+    @Override
+    public void visit(LoadLiteralIns loadLiteralIns) {
+        System.out.println(loadLiteralIns);
+    }
 }
