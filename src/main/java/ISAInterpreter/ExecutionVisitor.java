@@ -1,22 +1,49 @@
 package ISAInterpreter;
 
 import ISA.InstructionNodes.*;
+import ISA.Labels.Label;
 import ISA.Visitors.ISAVisitor;
 import ISAInterpreter.Registers.BinaryRegister;
 import ISAInterpreter.Registers.Register;
+import lombok.NonNull;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+// Although we use the "visitor" pattern here, this isn't a true visitor
+// in the sense of top down recursion. To support jump instructions in a
+// non-recursive manner (no stack overflows), we explicitly make a FSM.
 public class ExecutionVisitor implements ISAVisitor {
     private final RegisterFile regFile = new RegisterFile();
     private final ExecutionEngine executionEngine = new ExecutionEngine();
+    private final MemoryBank memoryBank = new MemoryBank();
+    private Map<Label, Integer> labelMap;
+    private int programCounter;
 
+
+    public void executeProgram(List<InstructionNode> instructions, Map<Label, Integer> labelIndex)
+    {
+        regFile.clear();
+        programCounter = 0;
+        labelMap = new HashMap<>(labelIndex);
+
+        while (programCounter < instructions.size()) {
+            if (programCounter < 0) {
+                // TODO: Create a proper set of exceptions
+                throw new RuntimeException("Invalid PC address when executing program");
+            }
+
+            // Evaluate the next instruction.
+            instructions.get(programCounter).accept(this);
+        }
+    }
+
+    // TODO: Probably should replace this w/ stub method or remove from visitor interface
+    // entirely eh
     @Override
     public void visitAllInstructions(List<InstructionNode> instructions) {
-        regFile.clear();
-        for (InstructionNode i : instructions) {
-            i.accept(this);
-        }
+
     }
 
     @Override
@@ -86,8 +113,7 @@ public class ExecutionVisitor implements ISAVisitor {
     public void visit(BinaryJz binaryJz) {
         BinaryRegister conditionReg = regFile.getBinaryReg(binaryJz.getConditionReg());
         if (conditionReg.getValue() == 0) {
-            // TODO: Jump!
-            ;
+            this.programCounter = labelMap.get(binaryJz.getLabel());
         }
     }
 
@@ -138,6 +164,7 @@ public class ExecutionVisitor implements ISAVisitor {
 
     @Override
     public void visit(LoadLiteralIns loadLiteralIns) {
-
+        ISA.Registers.@NonNull Register regName = loadLiteralIns.getRegister();
+        // TODO WTF
     }
 }
