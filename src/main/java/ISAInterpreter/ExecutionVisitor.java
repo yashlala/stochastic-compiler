@@ -113,7 +113,9 @@ public class ExecutionVisitor implements ISAVisitor {
     public void visit(BinaryJz binaryJz) {
         BinaryRegister conditionReg = regFile.getBinaryReg(binaryJz.getConditionReg());
         if (conditionReg.getValue() == 0) {
-            this.programCounter = labelMap.get(binaryJz.getLabel());
+            // The PC is incremented after every instruction, so when we jump we should
+            // set it to one _before_ the target label. 
+            this.programCounter = labelMap.get(binaryJz.getLabel()) - 1;
         }
     }
 
