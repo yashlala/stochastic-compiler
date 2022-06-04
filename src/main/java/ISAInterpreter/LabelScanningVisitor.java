@@ -112,4 +112,14 @@ public class LabelScanningVisitor implements ISAVisitor {
     public void visit(LoadLiteralIns loadLiteralIns) {
 
     }
+
+    @Override
+    public void visit(BinaryToStochasticIns binaryToStochasticIns) {
+
+    }
+
+    @Override
+    public void visit(StochasticToBinaryIns stochasticToBinaryIns) {
+
+    }
 }
