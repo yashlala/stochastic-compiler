@@ -13,7 +13,11 @@ public class RegisterFile {
     private final Map<String, StochasticRegister> stochasticStore = new HashMap<>();
 
     public Register getReg(String name) {
-        return binaryStore.get(name);
+        if (binaryStore.containsKey(name)) {
+            return binaryStore.get(name);
+        } else {
+            return stochasticStore.get(name);
+        }
     }
 
     public Register getReg(ISA.Registers.Register register) {
