@@ -84,7 +84,11 @@ public class ExecutionVisitor implements ISAVisitor {
 
     @Override
     public void visit(LessThan lessThan) {
-        // TODO: This needs to take both
+        Register lhs = regFile.getReg(lessThan.getSrc1());
+        Register rhs = regFile.getReg(lessThan.getSrc2());
+        String destName = lessThan.getDest().getName();
+        int destValue = lhs.toDouble() < rhs.toDouble() ? 1 : 0;
+        regFile.putReg(new BinaryRegister(destName, destValue));
     }
 
     @Override
