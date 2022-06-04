@@ -2,6 +2,7 @@ package ISAInterpreter.Registers;
 
 import ISA.Memory.MemoryAddress;
 import ISAInterpreter.MemoryBank;
+import ISAInterpreter.RegisterFile;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -51,6 +52,11 @@ public class StochasticRegister implements Register {
     @Override
     public void storeAccept(MemoryBank memoryBank, MemoryAddress address) {
         memoryBank.store(address, this);
+    }
+
+    @Override
+    public void putAccept(RegisterFile registerFile) {
+        registerFile.putReg(this);
     }
 
     @Override
