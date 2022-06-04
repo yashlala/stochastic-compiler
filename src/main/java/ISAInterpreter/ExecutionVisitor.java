@@ -164,7 +164,9 @@ public class ExecutionVisitor implements ISAVisitor {
 
     @Override
     public void visit(LoadLiteralIns loadLiteralIns) {
-        // TODO WTF
+        Register register = toNativeRegister(loadLiteralIns.getRegister());
+        register.fromDouble(loadLiteralIns.getValue().getValue());
+        regFile.putReg(register);
     }
 
     @Override

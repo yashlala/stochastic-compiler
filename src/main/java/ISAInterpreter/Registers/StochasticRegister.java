@@ -64,6 +64,11 @@ public class StochasticRegister implements Register {
         return (double) bitSet.cardinality() / frameSize;
     }
 
+    @Override
+    public void fromDouble(double value) {
+        // TODO Implement random value setting here!
+    }
+
     public int size() {
         return bitSet.size();
     }

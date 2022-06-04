@@ -9,12 +9,17 @@ public interface Register {
 
     double toDouble();
 
-    // Acceptor pattern hook for register loads into memoryBank
+    // Set your value based on the double's value.
+    void fromDouble(double value);
+
+    // Acceptor pattern hook for register loads into a MemoryBank
     void loadAccept(MemoryBank memoryBank, MemoryAddress address);
 
-    // Acceptor pattern hook for register stores into memoryBank
+    // Acceptor pattern hook for register stores into a MemoryBank
     void storeAccept(MemoryBank memoryBank, MemoryAddress address);
 
+    // Acceptor pattern hook for register puts into a RegisterFile.
+    // TODO: Maybe the "put/get" vs "load/store" should be made consistent.
     void putAccept(RegisterFile registerFile);
 
     String toString();

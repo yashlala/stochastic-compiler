@@ -52,4 +52,9 @@ public class BinaryRegister implements Register {
     public double toDouble() {
         return value;
     }
+
+    @Override
+    public void fromDouble(double value) {
+        this.setValue((int) Math.round(value));
+    }
 }
