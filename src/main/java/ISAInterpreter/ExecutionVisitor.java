@@ -4,6 +4,8 @@ import ISA.InstructionNodes.*;
 import ISA.Labels.Label;
 import ISA.Visitors.ISAVisitor;
 import ISAInterpreter.Registers.BinaryRegister;
+import ISAInterpreter.Registers.Register;
+import ISAInterpreter.Registers.StochasticRegister;
 import lombok.NonNull;
 
 import java.util.HashMap;
@@ -23,8 +25,9 @@ public class ExecutionVisitor implements ISAVisitor {
 
     public void executeProgram(List<InstructionNode> instructions, Map<Label, Integer> labelIndex) {
         regFile.clear();
-        programCounter = 0;
+        memoryBank.clear();
         labelMap = new HashMap<>(labelIndex);
+        programCounter = 0;
 
         while (programCounter < instructions.size()) {
             if (programCounter < 0) {
@@ -152,17 +155,33 @@ public class ExecutionVisitor implements ISAVisitor {
 
     @Override
     public void visit(LoadIns loadIns) {
-        // TODO
+        Register register = toNativeRegister(loadIns.getRegister());
+        memoryBank.load(loadIns.getAddress(), register);
+        // TODO: Add to regfile here
     }
 
     @Override
     public void visit(StoreIns storeIns) {
-
+        Register register = toNativeRegister(storeIns.getRegister());
+        // TODO: Look up in regfile here
+        memoryBank.store(storeIns.getAddress(), register);
     }
 
     @Override
     public void visit(LoadLiteralIns loadLiteralIns) {
         ISA.Registers.@NonNull Register regName = loadLiteralIns.getRegister();
         // TODO WTF
+    }
+
+    // Convert the ISA language's register types to our local ISAInterpreter's native registers.
+    // All new ISA register types can register a conversion mechanism here.
+    private Register toNativeRegister(ISA.Registers.Register register) {
+        if (register instanceof ISA.Registers.BinaryRegister) {
+            return new BinaryRegister((ISA.Registers.BinaryRegister) register);
+        } else if (register instanceof ISA.Registers.StochasticRegister) {
+            return new StochasticRegister((ISA.Registers.StochasticRegister) register);
+        } else {
+            throw new RuntimeException("Unknown Register type encountered");
+        }
     }
 }

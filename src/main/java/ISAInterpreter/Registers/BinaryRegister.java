@@ -1,5 +1,7 @@
 package ISAInterpreter.Registers;
 
+import ISA.Memory.MemoryAddress;
+import ISAInterpreter.MemoryBank;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -9,23 +11,35 @@ public class BinaryRegister implements Register {
     private final String name;
     private int value;
 
-    public BinaryRegister(String name) {
-        this.name = name;
-        this.value = 0;
-    }
-
     public BinaryRegister(String name, int value) {
         this.name = name;
         this.value = value;
     }
 
-    public BinaryRegister(BinaryRegister other) {
-        name = other.name;
-        value = other.value;
+    public BinaryRegister(String name) {
+        this(name, 0);
     }
 
-    public void copyValue(BinaryRegister other) {
-        value = other.value;
+    public BinaryRegister(ISA.Registers.BinaryRegister other) {
+        this(other.getName(), 0);
+    }
+
+    public BinaryRegister(BinaryRegister other) {
+        this(other.getName(), other.getValue());
+    }
+
+    public void assignFrom(BinaryRegister other) {
+        value = other.getValue();
+    }
+
+    @Override
+    public void loadAccept(MemoryBank memoryBank, MemoryAddress address) {
+        memoryBank.load(address, this);
+    }
+
+    @Override
+    public void storeAccept(MemoryBank memoryBank, MemoryAddress address) {
+        memoryBank.store(address, this);
     }
 
     @Override
