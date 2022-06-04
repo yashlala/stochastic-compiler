@@ -96,12 +96,7 @@ public class ExecutionVisitor implements ISAVisitor {
         BinaryRegister src1 = regFile.getBinaryReg(binaryEq.getSrc1());
         BinaryRegister src2 = regFile.getBinaryReg(binaryEq.getSrc2());
         String destName = binaryEq.getDest().getName();
-        int destValue;
-        if (src1.getValue() == src2.getValue()) {
-            destValue = 1;
-        } else {
-            destValue = 0;
-        }
+        int destValue = src1.getValue() == src2.getValue() ? 1 : 0;
         regFile.putReg(new BinaryRegister(destName, destValue));
     }
 
@@ -169,7 +164,6 @@ public class ExecutionVisitor implements ISAVisitor {
 
     @Override
     public void visit(LoadLiteralIns loadLiteralIns) {
-        ISA.Registers.@NonNull Register regName = loadLiteralIns.getRegister();
         // TODO WTF
     }
 
