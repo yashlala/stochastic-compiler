@@ -3,7 +3,6 @@ package ISAInterpreter;
 import ISA.Registers.Register;
 import ISAInterpreter.Registers.BinaryRegister;
 
-import java.util.Map;
 
 public class RegisterFile {
     // TODO: Let's just worry about all this later.
@@ -15,13 +14,11 @@ public class RegisterFile {
         return null;
     }
 
-    public BinaryRegister getBinaryReg(ISA.Registers.BinaryRegister register)
-    {
+    public BinaryRegister getBinaryReg(ISA.Registers.BinaryRegister register) {
         return this.getBinaryReg(register.getName());
     }
 
-    public RegisterFile setBinaryReg(BinaryRegister register)
-    {
+    public RegisterFile setBinaryReg(BinaryRegister register) {
         // TODO: Implement all this
         return this;
     }

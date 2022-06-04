@@ -10,8 +10,8 @@ import java.util.Map;
 public class LabelScanningVisitor implements ISAVisitor {
     private Map<Label, Integer> labelIndex;
     private int index;
-    public Map<Label, Integer> buildLabelIndex(List<InstructionNode> instructions)
-    {
+
+    public Map<Label, Integer> buildLabelIndex(List<InstructionNode> instructions) {
         labelIndex.clear();
         for (index = 0; index < instructions.size(); index++) {
             instructions.get(index).accept(this);

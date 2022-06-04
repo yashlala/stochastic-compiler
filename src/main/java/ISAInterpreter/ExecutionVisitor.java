@@ -4,7 +4,6 @@ import ISA.InstructionNodes.*;
 import ISA.Labels.Label;
 import ISA.Visitors.ISAVisitor;
 import ISAInterpreter.Registers.BinaryRegister;
-import ISAInterpreter.Registers.Register;
 import lombok.NonNull;
 
 import java.util.HashMap;
@@ -18,12 +17,11 @@ public class ExecutionVisitor implements ISAVisitor {
     private final RegisterFile regFile = new RegisterFile();
     private final ExecutionEngine executionEngine = new ExecutionEngine();
     private final MemoryBank memoryBank = new MemoryBank();
-    private Map<Label, Integer> labelMap;
+    private Map<Label, Integer> labelMap = new HashMap<>();
     private int programCounter;
 
 
-    public void executeProgram(List<InstructionNode> instructions, Map<Label, Integer> labelIndex)
-    {
+    public void executeProgram(List<InstructionNode> instructions, Map<Label, Integer> labelIndex) {
         regFile.clear();
         programCounter = 0;
         labelMap = new HashMap<>(labelIndex);
@@ -86,7 +84,6 @@ public class ExecutionVisitor implements ISAVisitor {
     public void visit(LessThan lessThan) {
         // This method can deal with both stochastic and binary inputs.
         // But it always outputs a binary output.
-
         // TODO
     }
 
@@ -106,7 +103,6 @@ public class ExecutionVisitor implements ISAVisitor {
 
     @Override
     public void visit(LabelNode labelNode) {
-
     }
 
     @Override
@@ -114,7 +110,7 @@ public class ExecutionVisitor implements ISAVisitor {
         BinaryRegister conditionReg = regFile.getBinaryReg(binaryJz.getConditionReg());
         if (conditionReg.getValue() == 0) {
             // The PC is incremented after every instruction, so when we jump we should
-            // set it to one _before_ the target label. 
+            // set it to one _before_ the target label.
             this.programCounter = labelMap.get(binaryJz.getLabel()) - 1;
         }
     }
@@ -156,7 +152,7 @@ public class ExecutionVisitor implements ISAVisitor {
 
     @Override
     public void visit(LoadIns loadIns) {
-
+        // TODO
     }
 
     @Override

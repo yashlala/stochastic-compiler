@@ -7,10 +7,12 @@ import java.util.BitSet;
 
 
 public class StochasticRegister implements Register {
-    @Getter @Setter
+    @Getter
+    @Setter
     private String name;
     private BitSet bitSet = new BitSet();
-    @Getter @Setter
+    @Getter
+    @Setter
     private int frameSize;
 
     public StochasticRegister(String name) {

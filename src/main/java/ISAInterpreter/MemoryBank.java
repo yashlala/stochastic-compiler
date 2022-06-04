@@ -1,11 +1,8 @@
 package ISAInterpreter;
 
-import ISA.InstructionNodes.BinaryAdd;
 import ISA.Memory.MemoryAddress;
 import ISAInterpreter.Registers.BinaryRegister;
-import ISAInterpreter.Registers.Register;
 import ISAInterpreter.Registers.StochasticRegister;
-import jdk.incubator.vector.VectorOperators;
 
 import java.util.HashMap;
 import java.util.Map;

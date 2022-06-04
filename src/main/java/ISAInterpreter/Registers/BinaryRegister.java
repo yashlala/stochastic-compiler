@@ -1,6 +1,5 @@
 package ISAInterpreter.Registers;
 
-import jdk.incubator.vector.VectorOperators;
 import lombok.Getter;
 import lombok.Setter;
 
