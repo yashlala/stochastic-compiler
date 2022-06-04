@@ -1,5 +1,6 @@
 package IR.IRNodes;
 
+import IR.Literals.Literal;
 import IR.Variables.Variable;
 import IR.Visitors.IRReturnVisitor;
 import IR.Visitors.IRVisitor;
@@ -13,7 +14,7 @@ public class SetLiteral implements IRNode{
     @NonNull
     private final Variable variable;
 
-    private final float literal;
+    private final Literal literal;
 
     @Override
     public void accept(IRVisitor visitor) {
