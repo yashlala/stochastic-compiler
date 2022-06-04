@@ -34,4 +34,6 @@ public interface IRVisitor {
     void visit(Load load);
 
     void visit(Store store);
+
+    void visit(SetLiteral setLiteral);
 }

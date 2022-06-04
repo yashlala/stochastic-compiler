@@ -1,6 +1,6 @@
 package IR.IRNodes;
 
-import IR.Labels.Label;
+import IR.Literals.Literal;
 import IR.Variables.Variable;
 import IR.Visitors.IRReturnVisitor;
 import IR.Visitors.IRVisitor;
@@ -10,13 +10,12 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public class IfNotEquals implements IRNode{
+public class SetLiteral implements IRNode{
     @NonNull
-    private final Variable cond1;
-    @NonNull
-    private final Variable cond2;
-    @NonNull
-    private final Label label;
+    private final Variable variable;
+
+    private final Literal literal;
+
     @Override
     public void accept(IRVisitor visitor) {
         visitor.visit(this);
@@ -29,6 +28,6 @@ public class IfNotEquals implements IRNode{
 
     @Override
     public String toString() {
-        return "ifne " + cond1 + " " + cond2 + " goto " + label;
+        return variable + " = " + literal;
     }
 }

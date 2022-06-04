@@ -34,4 +34,6 @@ public interface IRReturnVisitor<R> {
     R visit(Load load);
 
     R visit(Store store);
+
+    R visit(SetLiteral setLiteral);
 }

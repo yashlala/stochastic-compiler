@@ -79,4 +79,9 @@ public class PrintVisitor implements IRVisitor{
     public void visit(Store store) {
         System.out.println(store);
     }
+
+    @Override
+    public void visit(SetLiteral setLiteral) {
+        System.out.println(setLiteral);
+    }
 }
