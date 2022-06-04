@@ -2,6 +2,7 @@ package IR.IRNodes;
 
 import IR.Labels.Label;
 import IR.Variables.Variable;
+import IR.Visitors.IRReturnVisitor;
 import IR.Visitors.IRVisitor;
 import lombok.Getter;
 import lombok.NonNull;
@@ -19,6 +20,11 @@ public class IfNotEquals implements IRNode{
     @Override
     public void accept(IRVisitor visitor) {
         visitor.visit(this);
+    }
+
+    @Override
+    public <R> R accept(IRReturnVisitor<R> visitor) {
+        return visitor.visit(this);
     }
 
     @Override
