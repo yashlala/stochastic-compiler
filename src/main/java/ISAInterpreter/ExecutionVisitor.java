@@ -17,7 +17,6 @@ import java.util.Map;
 // non-recursive manner (no stack overflows), we explicitly make a FSM.
 public class ExecutionVisitor implements ISAVisitor {
     private final RegisterFile regFile = new RegisterFile();
-    private final ExecutionEngine executionEngine = new ExecutionEngine();
     private final MemoryBank memoryBank = new MemoryBank();
     private Map<Label, Integer> labelMap = new HashMap<>();
     private int programCounter;
@@ -171,6 +170,16 @@ public class ExecutionVisitor implements ISAVisitor {
     public void visit(LoadLiteralIns loadLiteralIns) {
         ISA.Registers.@NonNull Register regName = loadLiteralIns.getRegister();
         // TODO WTF
+    }
+
+    @Override
+    public void visit(BinaryToStochasticIns binaryToStochasticIns) {
+
+    }
+
+    @Override
+    public void visit(StochasticToBinaryIns stochasticToBinaryIns) {
+
     }
 
     // Convert the ISA language's register types to our local ISAInterpreter's native registers.

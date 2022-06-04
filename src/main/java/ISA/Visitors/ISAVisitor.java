@@ -42,4 +42,8 @@ public interface ISAVisitor {
     void visit(StoreIns storeIns);
 
     void visit(LoadLiteralIns loadLiteralIns);
+
+    void visit(BinaryToStochasticIns binaryToStochasticIns);
+
+    void visit(StochasticToBinaryIns stochasticToBinaryIns);
 }

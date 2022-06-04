@@ -101,4 +101,12 @@ public class PrintVisitor implements ISAVisitor{
     public void visit(LoadLiteralIns loadLiteralIns) {
         System.out.println(loadLiteralIns);
     }
+
+    public void visit(BinaryToStochasticIns binaryToStochasticIns) {
+        System.out.println(binaryToStochasticIns);
+    }
+
+    public void visit(StochasticToBinaryIns stochasticToBinaryIns) {
+        System.out.println(stochasticToBinaryIns);
+    }
 }
