@@ -6,7 +6,6 @@ import ISA.Visitors.ISAVisitor;
 import ISAInterpreter.Registers.BinaryRegister;
 import ISAInterpreter.Registers.Register;
 import ISAInterpreter.Registers.StochasticRegister;
-import lombok.NonNull;
 
 import java.util.HashMap;
 import java.util.List;
@@ -158,7 +157,7 @@ public class ExecutionVisitor implements ISAVisitor {
 
     @Override
     public void visit(StoreIns storeIns) {
-        Register register = regFile.getReg(storeIns.getRegister().getName());
+        Register register = regFile.getReg(storeIns.getRegister());
         memoryBank.store(storeIns.getAddress(), register);
     }
 
@@ -171,12 +170,18 @@ public class ExecutionVisitor implements ISAVisitor {
 
     @Override
     public void visit(BinaryToStochasticIns binaryToStochasticIns) {
-
+        BinaryRegister src = regFile.getBinaryReg(binaryToStochasticIns.getSrc());
+        StochasticRegister dest = new StochasticRegister(binaryToStochasticIns.getDest().getName());
+        dest.fromDouble(src.toDouble());
+        regFile.putReg(dest);
     }
 
     @Override
     public void visit(StochasticToBinaryIns stochasticToBinaryIns) {
-
+        StochasticRegister src = regFile.getStochasticReg(stochasticToBinaryIns.getSrc());
+        BinaryRegister dest = new BinaryRegister(stochasticToBinaryIns.getDest().getName());
+        dest.fromDouble(src.toDouble());
+        regFile.putReg(dest);
     }
 
     // Convert the ISA language's register types to our local ISAInterpreter's native registers.
