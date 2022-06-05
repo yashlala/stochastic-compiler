@@ -8,6 +8,7 @@ import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.BitSet;
+import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
 
 
@@ -102,5 +103,20 @@ public class StochasticRegister implements Register {
     @Override
     public String toString() {
         return name + " ~= " + this.toDouble();
+    }
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        StochasticRegister that = (StochasticRegister) o;
+        return getName().equals(that.getName())
+                && Math.abs(toDouble() - that.toDouble()) < 0.01;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getName());
     }
 }

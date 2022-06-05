@@ -6,6 +6,8 @@ import ISAInterpreter.RegisterFile;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.Objects;
+
 @Getter
 @Setter
 public class BinaryRegister implements Register {
@@ -61,5 +63,19 @@ public class BinaryRegister implements Register {
     @Override
     public String toString() {
         return name + " = " + value;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        BinaryRegister that = (BinaryRegister) o;
+        return getName().equals(that.getName())
+                && Math.abs(getValue() - that.getValue()) < 0.001;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getName());
     }
 }
