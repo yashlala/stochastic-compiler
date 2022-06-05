@@ -6,7 +6,9 @@ import ISAInterpreter.RegisterFile;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.BitSet;
+import java.util.concurrent.ThreadLocalRandom;
 
 
 public class StochasticRegister implements Register {
@@ -20,8 +22,12 @@ public class StochasticRegister implements Register {
 
     public StochasticRegister(String name, double value, int frameSize) {
         this.name = name;
-        // TODO: Implement proper value setting and getting here.
         this.frameSize = frameSize;
+        this.bitSet = encode(value, frameSize);
+    }
+
+    public StochasticRegister(double value, int frameSize) {
+        this("", value, frameSize);
     }
 
     public StochasticRegister(String name) {
@@ -39,7 +45,6 @@ public class StochasticRegister implements Register {
     }
 
     public void assignFrom(StochasticRegister other) {
-        // Don't copy the name!
         this.frameSize = other.frameSize;
         this.bitSet = (BitSet) other.bitSet.clone();
     }
@@ -64,17 +69,38 @@ public class StochasticRegister implements Register {
         return (double) bitSet.cardinality() / frameSize;
     }
 
+    // TODO: NOBODY should be using this! Always copy over the frame size!
     @Override
     public void fromDouble(double value) {
-        // TODO Implement proper value setting here!
+        fromDouble(value, 32);
+    }
+
+    public void fromDouble(double value, int frameSize) {
+        this.frameSize = frameSize;
+        this.bitSet = encode(value, frameSize);
+    }
+
+    private BitSet encode(double value, int frameSize) {
+        ArrayList<Integer> free = new ArrayList<Integer>();
+        ArrayList<Integer> set = new ArrayList<Integer>();
+        for (int i=0; i < frameSize; i++) {
+            free.add(i);
+        }
+
+        ThreadLocalRandom random = ThreadLocalRandom.current();
+        while (set.size() < frameSize) {
+            set.add(free.remove(random.nextInt(free.size())));
+        }
+
+        BitSet ret = new BitSet();
+        for (Integer i : set) {
+            ret.set(i);
+        }
+        return ret;
     }
 
     @Override
     public String toString() {
-        return name + " ~= " + ((double) bitSet.cardinality() / frameSize);
-    }
-
-    public int size() {
-        return bitSet.size();
+        return name + " ~= " + this.toDouble();
     }
 }

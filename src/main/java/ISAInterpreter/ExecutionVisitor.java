@@ -29,7 +29,7 @@ public class ExecutionVisitor implements ISAVisitor {
 
         while (programCounter < instructions.size()) {
             if (programCounter < 0) {
-                // TODO: Create a proper set of exceptions
+                // TODO: Create a proper set of exceptions. Preferably with PC counts.
                 throw new RuntimeException("Invalid PC address when executing program");
             }
 
@@ -38,11 +38,9 @@ public class ExecutionVisitor implements ISAVisitor {
         }
     }
 
-    // TODO: Probably should replace this w/ stub method or remove from visitor interface
-    // entirely eh
     @Override
     public void visitAllInstructions(List<InstructionNode> instructions) {
-
+        // Should this really be in the interface?
     }
 
     @Override
