@@ -27,14 +27,15 @@ public class ExecutionVisitor implements ISAVisitor {
         labelMap = new HashMap<>(labelIndex);
         programCounter = 0;
 
-        while (programCounter < instructions.size()) {
-            if (programCounter < 0) {
+        while (programCounter != instructions.size()) {
+            if (programCounter < 0 || programCounter > instructions.size()) {
                 // TODO: Create a proper set of exceptions. Preferably with PC counts.
                 throw new RuntimeException("Invalid PC address when executing program");
             }
 
             // Evaluate the next instruction.
             instructions.get(programCounter).accept(this);
+            programCounter++;
         }
     }
 
