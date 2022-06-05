@@ -81,6 +81,32 @@ public class StochasticRegister implements Register {
         this.bitSet = encode(value, frameSize);
     }
 
+    public StochasticRegister add(StochasticRegister other) {
+        // TODO
+        return null; 
+    }
+    public StochasticRegister subtract(StochasticRegister other) {
+        // TODO
+        return null;
+    }
+    public StochasticRegister multiply(StochasticRegister other) {
+        // TODO
+        return null;
+    }
+
+    public StochasticRegister divide(StochasticRegister other) {
+        // TODO
+        return null;
+    }
+    public StochasticRegister exp() {
+        // TODO
+        return null;
+    }
+    public StochasticRegister tanh() {
+        // TODO
+        return null;
+    }
+
     private BitSet encode(double value, int frameSize) {
         ArrayList<Integer> free = new ArrayList<Integer>();
         ArrayList<Integer> set = new ArrayList<Integer>();
