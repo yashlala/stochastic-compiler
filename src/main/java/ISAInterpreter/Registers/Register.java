@@ -22,5 +22,7 @@ public interface Register {
     // TODO: Maybe the "put/get" vs "load/store" should be made consistent.
     void putAccept(RegisterFile registerFile);
 
+    // Doesn't actually enforce anything, because the Object version of this method
+    // is always ready as a fallback. Oh well.
     String toString();
 }

@@ -10,9 +10,9 @@ import lombok.Setter;
 @Setter
 public class BinaryRegister implements Register {
     private final String name;
-    private int value;
+    private double value;
 
-    public BinaryRegister(String name, int value) {
+    public BinaryRegister(String name, double value) {
         this.name = name;
         this.value = value;
     }
@@ -55,6 +55,11 @@ public class BinaryRegister implements Register {
 
     @Override
     public void fromDouble(double value) {
-        this.setValue((int) Math.round(value));
+        this.value = value;
+    }
+
+    @Override
+    public String toString() {
+        return name + " = " + value;
     }
 }

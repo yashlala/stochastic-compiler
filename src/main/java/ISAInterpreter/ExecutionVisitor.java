@@ -50,7 +50,7 @@ public class ExecutionVisitor implements ISAVisitor {
         BinaryRegister src1 = regFile.getBinaryReg(binaryAdd.getSrc1());
         BinaryRegister src2 = regFile.getBinaryReg(binaryAdd.getSrc2());
         String destName = binaryAdd.getDest().getName();
-        int destValue = src1.getValue() + src2.getValue();
+        double destValue = src1.getValue() + src2.getValue();
         regFile.putReg(new BinaryRegister(destName, destValue));
     }
 
@@ -59,7 +59,7 @@ public class ExecutionVisitor implements ISAVisitor {
         BinaryRegister src1 = regFile.getBinaryReg(binarySub.getSrc1());
         BinaryRegister src2 = regFile.getBinaryReg(binarySub.getSrc2());
         String destName = binarySub.getDest().getName();
-        int destValue = src1.getValue() - src2.getValue();
+        double destValue = src1.getValue() - src2.getValue();
         regFile.putReg(new BinaryRegister(destName, destValue));
     }
 
@@ -68,7 +68,7 @@ public class ExecutionVisitor implements ISAVisitor {
         BinaryRegister src1 = regFile.getBinaryReg(binaryMul.getSrc1());
         BinaryRegister src2 = regFile.getBinaryReg(binaryMul.getSrc2());
         String destName = binaryMul.getDest().getName();
-        int destValue = src1.getValue() * src2.getValue();
+        double destValue = src1.getValue() * src2.getValue();
         regFile.putReg(new BinaryRegister(destName, destValue));
     }
 
@@ -77,7 +77,7 @@ public class ExecutionVisitor implements ISAVisitor {
         BinaryRegister src1 = regFile.getBinaryReg(binaryDiv.getSrc1());
         BinaryRegister src2 = regFile.getBinaryReg(binaryDiv.getSrc2());
         String destName = binaryDiv.getDest().getName();
-        int destValue = src1.getValue() / src2.getValue();
+        double destValue = src1.getValue() / src2.getValue();
         regFile.putReg(new BinaryRegister(destName, destValue));
     }
 
@@ -145,7 +145,7 @@ public class ExecutionVisitor implements ISAVisitor {
 
     @Override
     public void visit(PrintIns printIns) {
-
+        System.out.println(printIns.getRegister());
     }
 
     @Override
