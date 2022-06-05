@@ -9,6 +9,7 @@ import ISA.InstructionNodes.BinaryAdd;
 import ISA.InstructionNodes.InstructionNode;
 import ISA.Literals.Literal;
 import ISA.Registers.BinaryRegister;
+import ISA.Registers.RegisterPolarity;
 import ISA.Registers.StochasticRegister;
 import com.google.common.collect.ImmutableSet;
 import lombok.NonNull;
@@ -25,6 +26,8 @@ public class CompilerVisitor implements IRReturnVisitor<List<InstructionNode>> {
 
     @NonNull
     private final ImmutableSet<Variable> stochasticVariables;
+    private final int bitstreamWidth;
+    private final RegisterPolarity polarity;
 
     //two key sets are mutually exclusive
     private final Map<Variable, BinaryRegister> binaryRegisterMap = new HashMap<>();
@@ -45,6 +48,16 @@ public class CompilerVisitor implements IRReturnVisitor<List<InstructionNode>> {
         } else {
             BinaryRegister nextReg = new BinaryRegister(getNextRegisterName());
             binaryRegisterMap.put(variable, nextReg);
+            return nextReg;
+        }
+    }
+
+    private StochasticRegister getStochasticRegisterForVar(Variable variable) {
+        if (stochasticRegisterMap.containsKey(variable)) {
+            return stochasticRegisterMap.get(variable);
+        } else {
+            StochasticRegister nextReg = new StochasticRegister(getNextRegisterName(), polarity, bitstreamWidth);
+            stochasticRegisterMap.put(variable, nextReg);
             return nextReg;
         }
     }
