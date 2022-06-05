@@ -83,12 +83,14 @@ public class StochasticRegister implements Register {
 
     public StochasticRegister add(StochasticRegister other) {
         // TODO
-        return null; 
+        return null;
     }
+
     public StochasticRegister subtract(StochasticRegister other) {
         // TODO
         return null;
     }
+
     public StochasticRegister multiply(StochasticRegister other) {
         // TODO
         return null;
@@ -98,10 +100,12 @@ public class StochasticRegister implements Register {
         // TODO
         return null;
     }
+
     public StochasticRegister exp() {
         // TODO
         return null;
     }
+
     public StochasticRegister tanh() {
         // TODO
         return null;
@@ -110,7 +114,7 @@ public class StochasticRegister implements Register {
     private BitSet encode(double value, int frameSize) {
         ArrayList<Integer> free = new ArrayList<Integer>();
         ArrayList<Integer> set = new ArrayList<Integer>();
-        for (int i=0; i < frameSize; i++) {
+        for (int i = 0; i < frameSize; i++) {
             free.add(i);
         }
 
