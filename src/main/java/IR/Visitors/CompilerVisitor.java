@@ -95,6 +95,16 @@ public class CompilerVisitor implements IRReturnVisitor<List<InstructionNode>> {
 
     @Override
     public List<InstructionNode> visit(Add add) {
+        //make decision of which things are stochastic
+        //find the register mappings for each variable
+        //do any necessary conversions
+        //perform addition
+
+        //c = b + a
+        //b -> one[u9], a -> two, c-> three
+        //result
+        //sto2bin temp, one[u9]
+        //add three, two, temp
         return null;
     }
 
@@ -130,7 +140,9 @@ public class CompilerVisitor implements IRReturnVisitor<List<InstructionNode>> {
 
     @Override
     public List<InstructionNode> visit(LabelNode labelNode) {
-        return null;
+        List<InstructionNode> ISAins = new LinkedList<>();
+        ISAins.add(new ISA.InstructionNodes.LabelNode(new Label(labelNode.getLabel().getName())));
+        return ISAins;
     }
 
     @Override
@@ -140,7 +152,9 @@ public class CompilerVisitor implements IRReturnVisitor<List<InstructionNode>> {
 
     @Override
     public List<InstructionNode> visit(Goto aGoto) {
-        return null;
+        List<InstructionNode> ISAgoto = new LinkedList<>();
+        ISAgoto.add(new BinaryJz(new Label(aGoto.getLabel().getName()), zeroReg));
+        return ISAgoto;
     }
 
     @Override
