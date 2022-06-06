@@ -8,7 +8,7 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public class BinaryMul implements InstructionNode{
+public class BinaryMul implements InstructionNode {
     @NonNull
     private final BinaryRegister dest;
     @NonNull

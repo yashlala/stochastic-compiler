@@ -4,7 +4,7 @@ import ISA.InstructionNodes.*;
 
 import java.util.List;
 
-public class PrintVisitor implements ISAVisitor{
+public class PrintVisitor implements ISAVisitor {
 
 
     @Override
