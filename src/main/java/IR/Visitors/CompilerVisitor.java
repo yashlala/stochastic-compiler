@@ -1,14 +1,14 @@
 package IR.Visitors;
 
 import IR.IRNodes.*;
-import ISA.InstructionNodes.BinaryJz;
-import ISA.InstructionNodes.LoadLiteralIns;
+import IR.IRNodes.LabelNode;
+import IR.IRNodes.LessThan;
+import ISA.InstructionNodes.*;
 import ISA.Labels.Label;
 import IR.Variables.Variable;
-import ISA.InstructionNodes.BinaryAdd;
-import ISA.InstructionNodes.InstructionNode;
 import ISA.Literals.Literal;
 import ISA.Registers.BinaryRegister;
+import ISA.Registers.Register;
 import ISA.Registers.RegisterPolarity;
 import ISA.Registers.StochasticRegister;
 import com.google.common.collect.ImmutableSet;
@@ -23,6 +23,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class CompilerVisitor implements IRReturnVisitor<List<InstructionNode>> {
     private final BinaryRegister zeroReg = new BinaryRegister("zero");
+    private final Variable additionScaleFactor = new Variable("$addScale");
 
     @NonNull
     private final ImmutableSet<Variable> stochasticVariables;
@@ -108,17 +109,42 @@ public class CompilerVisitor implements IRReturnVisitor<List<InstructionNode>> {
 
     @Override
     public List<InstructionNode> visit(Add add) {
-        //make decision of which things are stochastic
-        //find the register mappings for each variable
-        //do any necessary conversions
-        //perform addition
+        List<InstructionNode> ISAadd = new LinkedList<>();
+        boolean stochDest = stochasticVariables.contains(add.getDest());
+        boolean stocharg1 = stochasticVariables.contains(add.getSrc1());
+        boolean stocharg2 = stochasticVariables.contains(add.getSrc2());
 
-        //c = b + a
-        //b -> one[u9], a -> two, c-> three
-        //result
-        //sto2bin temp, one[u9]
-        //add three, two, temp
-        return null;
+        if (!(stochDest || stocharg1 || stocharg2)) {
+            //if all arguments are binary, perform binary addition
+            BinaryRegister dest = getBinaryRegisterForVar(add.getDest());
+            BinaryRegister src1 = getBinaryRegisterForVar(add.getSrc1());
+            BinaryRegister src2 = getBinaryRegisterForVar(add.getSrc2());
+            ISAadd.add(new BinaryAdd(dest, src1, src2));
+        } else if (stochDest && stocharg1 && stocharg2) {
+            //if all arguments are stochastic, perform stochastic addition
+            StochasticRegister dest = getStochasticRegisterForVar(add.getDest());
+            StochasticRegister src1 = getStochasticRegisterForVar(add.getSrc1());
+            StochasticRegister src2 = getStochasticRegisterForVar(add.getSrc2());
+            //TODO: Ask YASH about scale - always 0.5
+            ISAadd.add(new StochasticAdd(dest, src1, src2));
+        } else if (stocharg1 == stocharg2) {
+            //if srcs agree on type, perform relevant operation then cast to dest type
+            Register tempDest;
+            if (stocharg1) {
+                StochasticRegister src1 = getStochasticRegisterForVar(add.getSrc1());
+                StochasticRegister src2 = getStochasticRegisterForVar(add.getSrc1());
+                tempDest = new StochasticRegister(getNextRegisterName(), polarity, bitstreamWidth);
+                //TODO: Ask YASH about scale
+                ISAadd.add(new StochasticAdd((StochasticRegister) tempDest, src1, src2));
+            } else {
+                BinaryRegister src1 = getBinaryRegisterForVar(add.getSrc1());
+                BinaryRegister src2 = getBinaryRegisterForVar(add.getSrc1());
+                tempDest = new BinaryRegister(getNextRegisterName());
+                ISAadd.add(new BinaryAdd((BinaryRegister) tempDest, src1, src2));
+            }
+
+        }
+        return ISAadd;
     }
 
     @Override
@@ -172,7 +198,15 @@ public class CompilerVisitor implements IRReturnVisitor<List<InstructionNode>> {
 
     @Override
     public List<InstructionNode> visit(Print print) {
-        return null;
+        List<InstructionNode> ISAprint = new LinkedList<>();
+        Register toPrint;
+        if (stochasticVariables.contains(print.getVar())) {
+            toPrint = getStochasticRegisterForVar(print.getVar());
+        } else {
+            toPrint = getBinaryRegisterForVar(print.getVar());
+        }
+        ISAprint.add(new PrintIns(toPrint));
+        return ISAprint;
     }
 
     @Override
