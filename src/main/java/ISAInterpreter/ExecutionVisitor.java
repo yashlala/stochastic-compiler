@@ -116,8 +116,9 @@ public class ExecutionVisitor implements ISAVisitor {
     public void visit(StochasticAdd stochasticAdd) {
         StochasticRegister src1 = regFile.getStochasticReg(stochasticAdd.getSrc1());
         StochasticRegister src2 = regFile.getStochasticReg(stochasticAdd.getSrc2());
-        StochasticRegister dest = new StochasticRegister(stochasticAdd.getDest().getName());
-        dest.assignFrom(src1.add(src2));
+        Register scale = regFile.getReg(stochasticAdd.getScale());
+        StochasticRegister dest = new StochasticRegister(stochasticAdd.getDest());
+        StochasticRegister.add(dest, src1, src2, scale);
         regFile.putReg(dest);
     }
 
@@ -125,8 +126,9 @@ public class ExecutionVisitor implements ISAVisitor {
     public void visit(StochasticSub stochasticSub) {
         StochasticRegister src1 = regFile.getStochasticReg(stochasticSub.getSrc1());
         StochasticRegister src2 = regFile.getStochasticReg(stochasticSub.getSrc2());
-        StochasticRegister dest = new StochasticRegister(stochasticSub.getDest().getName());
-        dest.assignFrom(src1.subtract(src2));
+        Register scale = regFile.getReg(stochasticSub.getScale());
+        StochasticRegister dest = new StochasticRegister(stochasticSub.getDest());
+        StochasticRegister.subtract(dest, src1, src2, scale);
         regFile.putReg(dest);
     }
 
@@ -134,8 +136,8 @@ public class ExecutionVisitor implements ISAVisitor {
     public void visit(StochasticMul stochasticMul) {
         StochasticRegister src1 = regFile.getStochasticReg(stochasticMul.getSrc1());
         StochasticRegister src2 = regFile.getStochasticReg(stochasticMul.getSrc2());
-        StochasticRegister dest = new StochasticRegister(stochasticMul.getDest().getName());
-        dest.assignFrom(src1.multiply(src2));
+        StochasticRegister dest = new StochasticRegister(stochasticMul.getDest());
+        StochasticRegister.multiply(dest, src1, src2);
         regFile.putReg(dest);
     }
 
@@ -143,24 +145,25 @@ public class ExecutionVisitor implements ISAVisitor {
     public void visit(StochasticDiv stochasticDiv) {
         StochasticRegister src1 = regFile.getStochasticReg(stochasticDiv.getSrc1());
         StochasticRegister src2 = regFile.getStochasticReg(stochasticDiv.getSrc2());
-        StochasticRegister dest = new StochasticRegister(stochasticDiv.getDest().getName());
-        dest.assignFrom(src1.divide(src2));
+        Register scale = regFile.getReg(stochasticDiv.getScale());
+        StochasticRegister dest = new StochasticRegister(stochasticDiv.getDest());
+        StochasticRegister.divide(dest, src1, src2, scale);
         regFile.putReg(dest);
     }
 
     @Override
     public void visit(StochasticExp stochasticExp) {
         StochasticRegister src = regFile.getStochasticReg(stochasticExp.getSrc1());
-        StochasticRegister dest = new StochasticRegister(stochasticExp.getDest().getName());
-        dest.assignFrom(src.exp());
+        StochasticRegister dest = new StochasticRegister(stochasticExp.getDest());
+        StochasticRegister.exp(dest, src);
         regFile.putReg(dest);
     }
 
     @Override
     public void visit(StochasticTanh stochasticTanh) {
         StochasticRegister src = regFile.getStochasticReg(stochasticTanh.getSrc1());
-        StochasticRegister dest = new StochasticRegister(stochasticTanh.getDest().getName());
-        dest.assignFrom(src.tanh());
+        StochasticRegister dest = new StochasticRegister(stochasticTanh.getDest());
+        StochasticRegister.tanh(dest, src);
         regFile.putReg(dest);
     }
 
