@@ -13,6 +13,8 @@ import java.util.concurrent.ThreadLocalRandom;
 
 
 public class StochasticRegister implements Register {
+    public static final double NOISE_COEFFICIENT = 0.1;
+
     @Getter
     @Setter
     private String name;
@@ -54,6 +56,7 @@ public class StochasticRegister implements Register {
         double scaleVal = scale.toDouble();
         double destVal = (src1.toDouble() * scaleVal) + ((1 - scaleVal) * src2.toDouble());
         checkAssignValue(dest, destVal);
+        addNoise(dest.bitSet, dest.getFrameSize(), NOISE_COEFFICIENT);
     }
 
     public static void subtract(StochasticRegister dest, StochasticRegister src1,
@@ -61,11 +64,13 @@ public class StochasticRegister implements Register {
         double scaleVal = scale.toDouble();
         double destVal = (src1.toDouble() * scaleVal) - ((1 - scaleVal) * src2.toDouble());
         checkAssignValue(dest, destVal);
+        addNoise(dest.bitSet, dest.getFrameSize(), NOISE_COEFFICIENT);
     }
 
     public static void multiply(StochasticRegister dest, StochasticRegister src1, StochasticRegister src2) {
         double destVal = (src1.toDouble() * src2.toDouble());
         checkAssignValue(dest, destVal);
+        addNoise(dest.bitSet, dest.getFrameSize(), NOISE_COEFFICIENT);
     }
 
     public static void divide(StochasticRegister dest, StochasticRegister src1,
@@ -73,16 +78,19 @@ public class StochasticRegister implements Register {
         double scaleVal = scale.toDouble();
         double destVal = src1.toDouble() / src2.toDouble() * scaleVal;
         saturateAssignValue(dest, destVal);
+        addNoise(dest.bitSet, dest.getFrameSize(), NOISE_COEFFICIENT);
     }
 
     public static void exp(StochasticRegister dest, StochasticRegister src) {
         double destVal = Math.exp(src.toDouble());
         checkAssignValue(dest, destVal);
+        addNoise(dest.bitSet, dest.getFrameSize(), NOISE_COEFFICIENT);
     }
 
     public static void tanh(StochasticRegister dest, StochasticRegister src) {
         double destVal = Math.tanh(src.toDouble());
         checkAssignValue(dest, destVal);
+        addNoise(dest.bitSet, dest.getFrameSize(), NOISE_COEFFICIENT);
     }
 
     private static void checkAssignValue(StochasticRegister register, double value) {
@@ -226,6 +234,13 @@ public class StochasticRegister implements Register {
             return (fractionOfOnes + 1) / 2;
         } else {
             throw new RuntimeException("Unknown Polarity Type Encountered");
+        }
+    }
+
+    private static void addNoise(BitSet bitSet, int frameSize, double noiseCoefficient) {
+        ThreadLocalRandom random = ThreadLocalRandom.current();
+        for (int i=0; i < Math.ceil(noiseCoefficient * frameSize); i++) {
+            bitSet.flip(random.nextInt(0, frameSize));
         }
     }
 }
