@@ -1,5 +1,6 @@
 package ISA.InstructionNodes;
 
+import ISA.Registers.Register;
 import ISA.Registers.StochasticRegister;
 import ISA.Visitors.ISAVisitor;
 import lombok.Getter;
@@ -17,7 +18,7 @@ public class StochasticDiv implements InstructionNode {
     private final StochasticRegister src2;
 
     @NonNull
-    private final StochasticRegister scale;
+    private final Register scale;
 
     @Override
     public void accept(ISAVisitor visitor) {

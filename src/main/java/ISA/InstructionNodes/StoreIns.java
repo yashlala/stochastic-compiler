@@ -9,7 +9,7 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public class StoreIns implements InstructionNode{
+public class StoreIns implements InstructionNode {
     @NonNull
     private final Register register;
     @NonNull

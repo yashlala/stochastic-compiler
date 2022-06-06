@@ -26,6 +26,6 @@ public class StochasticMul implements InstructionNode {
 
     @Override
     public String toString() {
-        return "mul " + dest + ", " + src1 + ", " + src2 + ", "  + scale;
+        return "mul " + dest + ", " + src1 + ", " + src2 + ", " + scale;
     }
 }
