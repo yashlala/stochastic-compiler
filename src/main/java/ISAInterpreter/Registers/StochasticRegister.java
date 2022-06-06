@@ -13,7 +13,6 @@ import java.util.concurrent.ThreadLocalRandom;
 
 
 public class StochasticRegister implements Register {
-    // TODO: Add noise to all arithmetic operations
     @Getter
     @Setter
     private String name;
@@ -86,28 +85,6 @@ public class StochasticRegister implements Register {
         checkAssignValue(dest, destVal);
     }
 
-    private static BitSet encode(double value, int frameSize, RegisterPolarity polarity) {
-        // TODO: Incorporate polarity
-        ArrayList<Integer> free = new ArrayList<Integer>();
-        ArrayList<Integer> set = new ArrayList<Integer>();
-        for (int i = 0; i < frameSize; i++) {
-            free.add(i);
-        }
-
-        ThreadLocalRandom random = ThreadLocalRandom.current();
-        while (set.size() < frameSize) {
-            set.add(free.remove(random.nextInt(free.size())));
-        }
-
-        BitSet ret = new BitSet();
-        for (Integer i : set) {
-            ret.set(i);
-        }
-        return ret;
-    }
-
-    // ACCEPTORS
-
     private static void checkAssignValue(StochasticRegister register, double value) {
         if (!inRange(value, register.getPolarity())) {
             throw new RuntimeException("Register " + register.getName() + " value out of range");
@@ -142,8 +119,6 @@ public class StochasticRegister implements Register {
         }
     }
 
-    // STATIC METHODS
-
     // Copy the "data" of another stochastic register.
     public void assignFrom(StochasticRegister other) {
         this.frameSize = other.frameSize;
@@ -156,7 +131,7 @@ public class StochasticRegister implements Register {
         return decode(bitSet, frameSize, polarity);
     }
 
-    // Be careful when you call this function! It'll only use the info you give it.
+    // Be careful when you call this function! It doesn't adjust width and polarity.
     @Override
     public void fromDouble(double value) {
         this.bitSet = encode(value, this.getFrameSize(), this.getPolarity());
@@ -205,7 +180,52 @@ public class StochasticRegister implements Register {
         registerFile.putReg(this);
     }
 
+
+    private static BitSet encode(double value, int frameSize, RegisterPolarity polarity) {
+        if (!inRange(value, polarity)) {
+            throw new RuntimeException("Cannot encode stochastic bistream; value out of range");
+        }
+
+        double fractionOfOnes;
+        if (polarity == RegisterPolarity.UNIPOLAR) {
+            fractionOfOnes = value;
+        } else if (polarity == RegisterPolarity.BIPOLAR) {
+            fractionOfOnes = 2 * value - 1;
+        } else {
+            throw new RuntimeException("Unknown Polarity Type Encountered");
+        }
+
+        // As of 2022-06-06, we're not actually simulating stochastic bit operations.
+        // Instead, we decode into binary, perform floating operations at full precision,
+        // then reencode into stochastic form. Noise terms are explicitly introduced later.
+        // As such, it doesn't...really matter that we implement this right.
+
+        ArrayList<Integer> free = new ArrayList<Integer>();
+        ArrayList<Integer> set = new ArrayList<Integer>();
+        for (int i = 0; i < frameSize; i++) {
+            free.add(i);
+        }
+
+        ThreadLocalRandom random = ThreadLocalRandom.current();
+        while (set.size() < fractionOfOnes * frameSize) {
+            set.add(free.remove(random.nextInt(free.size())));
+        }
+
+        BitSet ret = new BitSet();
+        for (Integer i : set) {
+            ret.set(i);
+        }
+        return ret;
+    }
+
     private double decode(BitSet bitSet, int frameSize, RegisterPolarity polarity) {
-        return (double) bitSet.cardinality() / frameSize;
+        double fractionOfOnes = (double) bitSet.cardinality() / frameSize;
+        if (polarity == RegisterPolarity.UNIPOLAR) {
+            return fractionOfOnes;
+        } else if (polarity == RegisterPolarity.BIPOLAR) {
+            return (fractionOfOnes + 1) / 2;
+        } else {
+            throw new RuntimeException("Unknown Polarity Type Encountered");
+        }
     }
 }
