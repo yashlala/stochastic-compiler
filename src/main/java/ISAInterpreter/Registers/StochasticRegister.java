@@ -1,6 +1,5 @@
 package ISAInterpreter.Registers;
 
-import ISA.Memory.MemoryAddress;
 import ISA.Registers.RegisterPolarity;
 import ISAInterpreter.MemoryBank;
 import ISAInterpreter.RegisterFile;
@@ -14,6 +13,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 
 public class StochasticRegister implements Register {
+    // TODO: Add noise to all arithmetic operations
     @Getter
     @Setter
     private String name;
@@ -41,10 +41,6 @@ public class StochasticRegister implements Register {
         this("", value, frameSize);
     }
 
-    public StochasticRegister(String name) {
-        this(name, 0, 0);
-    }
-
     public StochasticRegister(ISA.Registers.StochasticRegister other) {
         this(other.getName(), 0, other.getWidth(), other.getPolarity());
     }
@@ -54,8 +50,6 @@ public class StochasticRegister implements Register {
         this.assignFrom(other);
     }
 
-    // dest = src1 + src2.
-    // Preserve dest object!
     public static void add(StochasticRegister dest, StochasticRegister src1,
                            StochasticRegister src2, Register scale) {
         double scaleVal = scale.toDouble();
@@ -94,7 +88,6 @@ public class StochasticRegister implements Register {
 
     private static BitSet encode(double value, int frameSize, RegisterPolarity polarity) {
         // TODO: Incorporate polarity
-        // TODO: Incorporate noise into everything
         ArrayList<Integer> free = new ArrayList<Integer>();
         ArrayList<Integer> set = new ArrayList<Integer>();
         for (int i = 0; i < frameSize; i++) {
@@ -163,10 +156,10 @@ public class StochasticRegister implements Register {
         return decode(bitSet, frameSize, polarity);
     }
 
-    // TODO: NOBODY should be using this! Always copy over the frame size!
+    // Be careful when you call this function! It'll only use the info you give it.
     @Override
     public void fromDouble(double value) {
-        fromDouble(value, 32, RegisterPolarity.BIPOLAR);
+        this.bitSet = encode(value, this.getFrameSize(), this.getPolarity());
     }
 
     public void fromDouble(double value, int frameSize, RegisterPolarity polarity) {
@@ -198,12 +191,12 @@ public class StochasticRegister implements Register {
     }
 
     @Override
-    public void loadAccept(MemoryBank memoryBank, MemoryAddress address) {
+    public void loadAccept(MemoryBank memoryBank, int address) {
         memoryBank.load(address, this);
     }
 
     @Override
-    public void storeAccept(MemoryBank memoryBank, MemoryAddress address) {
+    public void storeAccept(MemoryBank memoryBank, int address) {
         memoryBank.store(address, this);
     }
 

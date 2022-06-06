@@ -1,6 +1,5 @@
 package ISAInterpreter.Registers;
 
-import ISA.Memory.MemoryAddress;
 import ISAInterpreter.MemoryBank;
 import ISAInterpreter.RegisterFile;
 import lombok.Getter;
@@ -36,12 +35,12 @@ public class BinaryRegister implements Register {
     }
 
     @Override
-    public void loadAccept(MemoryBank memoryBank, MemoryAddress address) {
+    public void loadAccept(MemoryBank memoryBank, int address) {
         memoryBank.load(address, this);
     }
 
     @Override
-    public void storeAccept(MemoryBank memoryBank, MemoryAddress address) {
+    public void storeAccept(MemoryBank memoryBank, int address) {
         memoryBank.store(address, this);
     }
 

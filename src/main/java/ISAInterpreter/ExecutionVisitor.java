@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 // Although we use the "visitor" pattern here, this isn't a true visitor
-// in the sense of top down recursion. To support jump instructions in a
+// in the sense of top-down recursion. To support jump instructions in a
 // non-recursive manner (no stack overflows), we explicitly make a FSM.
 public class ExecutionVisitor implements ISAVisitor {
     private final RegisterFile regFile = new RegisterFile();
@@ -174,15 +174,17 @@ public class ExecutionVisitor implements ISAVisitor {
 
     @Override
     public void visit(LoadIns loadIns) {
-        Register register = toNativeRegister(loadIns.getRegister());
-        memoryBank.load(loadIns.getAddress(), register);
+        BinaryRegister register = new BinaryRegister(loadIns.getRegister());
+        BinaryRegister address = regFile.getBinaryReg(loadIns.getAddress());
+        memoryBank.load((int) Math.round(address.toDouble()), register);
         regFile.putReg(register);
     }
 
     @Override
     public void visit(StoreIns storeIns) {
-        Register register = regFile.getReg(storeIns.getRegister());
-        memoryBank.store(storeIns.getAddress(), register);
+        BinaryRegister register = regFile.getBinaryReg(storeIns.getRegister());
+        BinaryRegister address = regFile.getBinaryReg(storeIns.getAddress());
+        memoryBank.store((int) Math.round(address.toDouble()), register);
     }
 
     @Override
@@ -195,7 +197,7 @@ public class ExecutionVisitor implements ISAVisitor {
     @Override
     public void visit(BinaryToStochasticIns binaryToStochasticIns) {
         BinaryRegister src = regFile.getBinaryReg(binaryToStochasticIns.getSrc());
-        StochasticRegister dest = new StochasticRegister(binaryToStochasticIns.getDest().getName());
+        StochasticRegister dest = new StochasticRegister(binaryToStochasticIns.getDest());
         dest.fromDouble(src.toDouble());
         regFile.putReg(dest);
     }
@@ -203,7 +205,7 @@ public class ExecutionVisitor implements ISAVisitor {
     @Override
     public void visit(StochasticToBinaryIns stochasticToBinaryIns) {
         StochasticRegister src = regFile.getStochasticReg(stochasticToBinaryIns.getSrc());
-        BinaryRegister dest = new BinaryRegister(stochasticToBinaryIns.getDest().getName());
+        BinaryRegister dest = new BinaryRegister(stochasticToBinaryIns.getDest());
         dest.fromDouble(src.toDouble());
         regFile.putReg(dest);
     }
