@@ -1,7 +1,6 @@
 package ISA.InstructionNodes;
 
-import ISA.Memory.MemoryAddress;
-import ISA.Registers.Register;
+import ISA.Registers.BinaryRegister;
 import ISA.Visitors.ISAVisitor;
 import lombok.Getter;
 import lombok.NonNull;
@@ -11,9 +10,9 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class StoreIns implements InstructionNode {
     @NonNull
-    private final Register register;
+    private final BinaryRegister register;
     @NonNull
-    private final MemoryAddress address;
+    private final BinaryRegister address;
 
     @Override
     public void accept(ISAVisitor visitor) {
@@ -22,6 +21,6 @@ public class StoreIns implements InstructionNode {
 
     @Override
     public String toString() {
-        return "sw " + register + ", " + address;
+        return "sw " + register + ", @" + address;
     }
 }

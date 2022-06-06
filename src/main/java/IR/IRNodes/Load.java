@@ -1,6 +1,5 @@
 package IR.IRNodes;
 
-import IR.MemoryAddresses.MemoryAddress;
 import IR.Variables.Variable;
 import IR.Visitors.IRReturnVisitor;
 import IR.Visitors.IRVisitor;
@@ -14,7 +13,7 @@ public class Load implements IRNode{
     @NonNull
     private final Variable dest;
     @NonNull
-    private final MemoryAddress address;
+    private final Variable address;
 
     @Override
     public void accept(IRVisitor visitor) {

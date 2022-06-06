@@ -2,7 +2,6 @@ package IR;
 
 import IR.IRNodes.*;
 import IR.Labels.Label;
-import IR.MemoryAddresses.MemoryAddress;
 import IR.Variables.Variable;
 import IR.Visitors.PrintVisitor;
 
@@ -40,7 +39,7 @@ public class IRNodeTests {
         LessThan lt = new LessThan(generateVariable(++counter), generateVariable(++counter), generateVariable(++counter));
         instructions.add(lt);
 
-        Load load = new Load(generateVariable(++counter), generateAddress(++counter));
+        Load load = new Load(generateVariable(++counter), generateVariable(++counter));
         instructions.add(load);
 
         Multiply mul = new Multiply(generateVariable(++counter), generateVariable(++counter), generateVariable(++counter));
@@ -49,7 +48,7 @@ public class IRNodeTests {
         Print p = new Print(generateVariable(++counter));
         instructions.add(p);
 
-        Store store = new Store(generateAddress(++counter), generateVariable(++counter));
+        Store store = new Store(generateVariable(++counter), generateVariable(++counter));
         instructions.add(store);
 
         Subtract sub = new Subtract(generateVariable(++counter), generateVariable(++counter), generateVariable(++counter));
@@ -68,9 +67,5 @@ public class IRNodeTests {
 
     public static Label generateLabel(int c) {
         return new Label(Integer.toString(c));
-    }
-
-    public static MemoryAddress generateAddress(int c) {
-        return new MemoryAddress(c * 8000);
     }
 }
