@@ -284,12 +284,170 @@ public class CompilerVisitor implements IRReturnVisitor<List<InstructionNode>> {
 
     @Override
     public List<InstructionNode> visit(Multiply multiply) {
-        return null;
+        List<InstructionNode> mulIns = new LinkedList<>();
+        boolean stochDest = stochasticVariables.contains(multiply.getDest());
+        boolean stocharg1 = stochasticVariables.contains(multiply.getSrc1());
+        boolean stocharg2 = stochasticVariables.contains(multiply.getSrc2());
+
+        if (!(stochDest || stocharg1 || stocharg2)) {
+            //if all arguments are binary, perform binary subtraction
+            BinaryRegister dest = getBinaryRegisterForVar(multiply.getDest());
+            BinaryRegister src1 = getBinaryRegisterForVar(multiply.getSrc1());
+            BinaryRegister src2 = getBinaryRegisterForVar(multiply.getSrc2());
+            mulIns.add(new BinaryMul(dest, src1, src2));
+        } else if (stochDest && stocharg1 && stocharg2) {
+            //if all arguments are stochastic, perform stochastic subtraction
+            StochasticRegister dest = getStochasticRegisterForVar(multiply.getDest());
+            StochasticRegister src1 = getStochasticRegisterForVar(multiply.getSrc1());
+            StochasticRegister src2 = getStochasticRegisterForVar(multiply.getSrc2());
+            mulIns.addAll(performStochasticMultiplication(dest, src1, src2));
+        } else if (stocharg1 == stocharg2) {
+            //if srcs agree on type, perform relevant operation then cast to dest type
+            Register tempDest;
+            if (stocharg1) {
+                StochasticRegister src1 = getStochasticRegisterForVar(multiply.getSrc1());
+                StochasticRegister src2 = getStochasticRegisterForVar(multiply.getSrc2());
+                tempDest = new StochasticRegister(getNextRegisterName(), polarity, bitstreamWidth);
+                mulIns.addAll(performStochasticMultiplication((StochasticRegister) tempDest, src1, src2));
+            } else {
+                BinaryRegister src1 = getBinaryRegisterForVar(multiply.getSrc1());
+                BinaryRegister src2 = getBinaryRegisterForVar(multiply.getSrc2());
+                tempDest = new BinaryRegister(getNextRegisterName());
+                mulIns.add(new BinaryMul((BinaryRegister) tempDest, src1, src2));
+            }
+            //invariant, dest reg is opposite of tempDest
+            if (stochDest) {
+                StochasticRegister dest = getStochasticRegisterForVar(multiply.getDest());
+                mulIns.addAll(convertBinarytoStochastic((BinaryRegister) tempDest, dest));
+            } else {
+                BinaryRegister dest = getBinaryRegisterForVar(multiply.getDest());
+                mulIns.addAll(convertStochasticToBinary((StochasticRegister) tempDest, dest));
+            }
+        } else {
+            //src disagree on type, so convert to dest type
+            if (stochDest) {
+                StochasticRegister dest = getStochasticRegisterForVar(multiply.getDest());
+                StochasticRegister src1;
+                StochasticRegister src2;
+                if (stocharg1) {
+                    src1 = getStochasticRegisterForVar(multiply.getSrc1());
+                    //guaranteed src2 is binary
+                    src2 = new StochasticRegister(getNextRegisterName(), polarity, bitstreamWidth);
+                    BinaryRegister tempSrc2 = getBinaryRegisterForVar(multiply.getSrc2());
+                    mulIns.addAll(convertBinarytoStochastic(tempSrc2, src2));
+                } else {
+                    src2 = getStochasticRegisterForVar(multiply.getSrc2());
+                    //guaranteed src1 is binary
+                    src1 = new StochasticRegister(getNextRegisterName(), polarity, bitstreamWidth);
+                    BinaryRegister tempSrc1 = getBinaryRegisterForVar(multiply.getSrc1());
+                    mulIns.addAll(convertBinarytoStochastic(tempSrc1, src1));
+                }
+                mulIns.addAll(performStochasticMultiplication(dest, src1, src2));
+            } else {
+                BinaryRegister dest = getBinaryRegisterForVar(multiply.getDest());
+                BinaryRegister src1;
+                BinaryRegister src2;
+                if (!stocharg1) {
+                    src1 = getBinaryRegisterForVar(multiply.getSrc1());
+                    //guaranteed src2 is stoch
+                    src2 = new BinaryRegister(getNextRegisterName());
+                    StochasticRegister tempSrc2 = getStochasticRegisterForVar(multiply.getSrc2());
+                    mulIns.addAll(convertStochasticToBinary(tempSrc2, src2));
+                } else {
+                    src2 = getBinaryRegisterForVar(multiply.getSrc2());
+                    //guaranteed src1 is stoch
+                    src1 = new BinaryRegister(getNextRegisterName());
+                    StochasticRegister tempSrc1 = getStochasticRegisterForVar(multiply.getSrc1());
+                    mulIns.addAll(convertStochasticToBinary(tempSrc1, src1));
+                }
+                mulIns.add(new BinaryMul(dest, src1, src2));
+            }
+        }
+        return mulIns;
     }
 
     @Override
     public List<InstructionNode> visit(Divide divide) {
-        return null;
+        List<InstructionNode> divIns = new LinkedList<>();
+        boolean stochDest = stochasticVariables.contains(divide.getDest());
+        boolean stocharg1 = stochasticVariables.contains(divide.getSrc1());
+        boolean stocharg2 = stochasticVariables.contains(divide.getSrc2());
+
+        if (!(stochDest || stocharg1 || stocharg2)) {
+            //if all arguments are binary, perform binary subtraction
+            BinaryRegister dest = getBinaryRegisterForVar(divide.getDest());
+            BinaryRegister src1 = getBinaryRegisterForVar(divide.getSrc1());
+            BinaryRegister src2 = getBinaryRegisterForVar(divide.getSrc2());
+            divIns.add(new BinaryDiv(dest, src1, src2));
+        } else if (stochDest && stocharg1 && stocharg2) {
+            //if all arguments are stochastic, perform stochastic subtraction
+            StochasticRegister dest = getStochasticRegisterForVar(divide.getDest());
+            StochasticRegister src1 = getStochasticRegisterForVar(divide.getSrc1());
+            StochasticRegister src2 = getStochasticRegisterForVar(divide.getSrc2());
+            divIns.addAll(performStochasticDivision(dest, src1, src2));
+        } else if (stocharg1 == stocharg2) {
+            //if srcs agree on type, perform relevant operation then cast to dest type
+            Register tempDest;
+            if (stocharg1) {
+                StochasticRegister src1 = getStochasticRegisterForVar(divide.getSrc1());
+                StochasticRegister src2 = getStochasticRegisterForVar(divide.getSrc2());
+                tempDest = new StochasticRegister(getNextRegisterName(), polarity, bitstreamWidth);
+                divIns.addAll(performStochasticDivision((StochasticRegister) tempDest, src1, src2));
+            } else {
+                BinaryRegister src1 = getBinaryRegisterForVar(divide.getSrc1());
+                BinaryRegister src2 = getBinaryRegisterForVar(divide.getSrc2());
+                tempDest = new BinaryRegister(getNextRegisterName());
+                divIns.add(new BinaryDiv((BinaryRegister) tempDest, src1, src2));
+            }
+            //invariant, dest reg is opposite of tempDest
+            if (stochDest) {
+                StochasticRegister dest = getStochasticRegisterForVar(divide.getDest());
+                divIns.addAll(convertBinarytoStochastic((BinaryRegister) tempDest, dest));
+            } else {
+                BinaryRegister dest = getBinaryRegisterForVar(divide.getDest());
+                divIns.addAll(convertStochasticToBinary((StochasticRegister) tempDest, dest));
+            }
+        } else {
+            //src disagree on type, so convert to dest type
+            if (stochDest) {
+                StochasticRegister dest = getStochasticRegisterForVar(divide.getDest());
+                StochasticRegister src1;
+                StochasticRegister src2;
+                if (stocharg1) {
+                    src1 = getStochasticRegisterForVar(divide.getSrc1());
+                    //guaranteed src2 is binary
+                    src2 = new StochasticRegister(getNextRegisterName(), polarity, bitstreamWidth);
+                    BinaryRegister tempSrc2 = getBinaryRegisterForVar(divide.getSrc2());
+                    divIns.addAll(convertBinarytoStochastic(tempSrc2, src2));
+                } else {
+                    src2 = getStochasticRegisterForVar(divide.getSrc2());
+                    //guaranteed src1 is binary
+                    src1 = new StochasticRegister(getNextRegisterName(), polarity, bitstreamWidth);
+                    BinaryRegister tempSrc1 = getBinaryRegisterForVar(divide.getSrc1());
+                    divIns.addAll(convertBinarytoStochastic(tempSrc1, src1));
+                }
+                divIns.addAll(performStochasticDivision(dest, src1, src2));
+            } else {
+                BinaryRegister dest = getBinaryRegisterForVar(divide.getDest());
+                BinaryRegister src1;
+                BinaryRegister src2;
+                if (!stocharg1) {
+                    src1 = getBinaryRegisterForVar(divide.getSrc1());
+                    //guaranteed src2 is stoch
+                    src2 = new BinaryRegister(getNextRegisterName());
+                    StochasticRegister tempSrc2 = getStochasticRegisterForVar(divide.getSrc2());
+                    divIns.addAll(convertStochasticToBinary(tempSrc2, src2));
+                } else {
+                    src2 = getBinaryRegisterForVar(divide.getSrc2());
+                    //guaranteed src1 is stoch
+                    src1 = new BinaryRegister(getNextRegisterName());
+                    StochasticRegister tempSrc1 = getStochasticRegisterForVar(divide.getSrc1());
+                    divIns.addAll(convertStochasticToBinary(tempSrc1, src1));
+                }
+                divIns.add(new BinaryDiv(dest, src1, src2));
+            }
+        }
+        return divIns;
     }
 
     @Override
@@ -546,5 +704,14 @@ public class CompilerVisitor implements IRReturnVisitor<List<InstructionNode>> {
         initStochasticOneIfNeeded(mulList);
         mulList.add(new StochasticDiv(dest, dest, inverseScaleFactor, one));
         return mulList;
+    }
+
+    private List<InstructionNode> performStochasticDivision(StochasticRegister dest, StochasticRegister src1, StochasticRegister src2) {
+        List<InstructionNode> divList = new LinkedList<>();
+        //division results in f * the desired value
+        StochasticRegister inverseScaleFactor = getStochasticRegisterForVar(inverseScaleFactorVariable);
+        initInverseScaleIfNeeded(divList);
+        divList.add(new StochasticDiv(dest, src1, src2, inverseScaleFactor));
+        return divList;
     }
 }
