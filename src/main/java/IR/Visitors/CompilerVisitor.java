@@ -15,18 +15,19 @@ import com.google.common.collect.ImmutableSet;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @RequiredArgsConstructor
 public class CompilerVisitor implements IRReturnVisitor<List<InstructionNode>> {
     private final BinaryRegister zeroReg = new BinaryRegister("zero");
     private final Variable addS = new Variable("$addScale");
     private final Variable scaleFactorVariable = new Variable("$scaleFactor");
+    private final Variable inverseScaleFactorVariable = new Variable("$inverseScaleFactor");
+    private final Variable additionUpscaleVariable = new Variable("$additionUpscale");
     private boolean scaleFactorInitialized = false;
     private boolean addSInitialized = false;
+    private boolean additionUpscaleInitialized = false;
+    private boolean inverseScaleInitialized = false;
 
     @NonNull
     private final ImmutableSet<Variable> stochasticVariables;
@@ -129,10 +130,7 @@ public class CompilerVisitor implements IRReturnVisitor<List<InstructionNode>> {
             StochasticRegister dest = getStochasticRegisterForVar(add.getDest());
             StochasticRegister src1 = getStochasticRegisterForVar(add.getSrc1());
             StochasticRegister src2 = getStochasticRegisterForVar(add.getSrc2());
-            //TODO: rescale by 2
-            BinaryRegister addSReg = getBinaryRegisterForVar(addS);
-            initAddSIfNeeded(ISAadd);
-            ISAadd.add(new StochasticAdd(dest, src1, src2, addSReg));
+            ISAadd.addAll(performStochasticAddition(dest, src1, src2));
         } else if (stocharg1 == stocharg2) {
             //if srcs agree on type, perform relevant operation then cast to dest type
             Register tempDest;
@@ -140,10 +138,7 @@ public class CompilerVisitor implements IRReturnVisitor<List<InstructionNode>> {
                 StochasticRegister src1 = getStochasticRegisterForVar(add.getSrc1());
                 StochasticRegister src2 = getStochasticRegisterForVar(add.getSrc1());
                 tempDest = new StochasticRegister(getNextRegisterName(), polarity, bitstreamWidth);
-                //TODO: rescale by 2
-                BinaryRegister addSReg = getBinaryRegisterForVar(addS);
-                initAddSIfNeeded(ISAadd);
-                ISAadd.add(new StochasticAdd((StochasticRegister) tempDest, src1, src2, addSReg));
+                ISAadd.addAll(performStochasticAddition((StochasticRegister) tempDest, src1, src2));
             } else {
                 BinaryRegister src1 = getBinaryRegisterForVar(add.getSrc1());
                 BinaryRegister src2 = getBinaryRegisterForVar(add.getSrc1());
@@ -177,10 +172,7 @@ public class CompilerVisitor implements IRReturnVisitor<List<InstructionNode>> {
                     BinaryRegister tempSrc1 = getBinaryRegisterForVar(add.getSrc1());
                     ISAadd.addAll(convertBinarytoStochastic(tempSrc1, src1));
                 }
-                //TODO: rescale by 2
-                BinaryRegister addSReg = getBinaryRegisterForVar(addS);
-                initAddSIfNeeded(ISAadd);
-                ISAadd.add(new StochasticAdd(dest, src1, src2, addSReg));
+                ISAadd.addAll(performStochasticAddition(dest, src1, src2));
             } else {
                 BinaryRegister dest = getBinaryRegisterForVar(add.getDest());
                 BinaryRegister src1;
@@ -204,6 +196,21 @@ public class CompilerVisitor implements IRReturnVisitor<List<InstructionNode>> {
         return ISAadd;
     }
 
+    private List<InstructionNode> performStochasticAddition(StochasticRegister dest, StochasticRegister src1, StochasticRegister src2) {
+        List<InstructionNode> additionList = new LinkedList<>();
+        BinaryRegister addSReg = getBinaryRegisterForVar(addS);
+        initAddSIfNeeded(additionList);
+        //addition results in 1/2 of desired value
+        additionList.add(new StochasticAdd(dest, src1, src2, addSReg));
+        //need to divide by 1/2 to get desired value
+        StochasticRegister upscaleFactor = getStochasticRegisterForVar(additionUpscaleVariable);
+        initUpscaleIfNeeded(additionList);
+        StochasticRegister inverseScaleFactor = getStochasticRegisterForVar(inverseScaleFactorVariable);
+        initInverseScaleIfNeeded(additionList);
+        additionList.add(new StochasticDiv(dest, dest, upscaleFactor, inverseScaleFactor));
+        return additionList;
+    }
+
     private void initAddSIfNeeded(List<InstructionNode> ins) {
         if (!addSInitialized) {
             //creates mapping for scaleFactorReg
@@ -218,6 +225,22 @@ public class CompilerVisitor implements IRReturnVisitor<List<InstructionNode>> {
             BinaryRegister scaleFactorReg = getBinaryRegisterForVar(scaleFactorVariable);
             scaleFactorInitialized = true;
             ins.add(new LoadLiteralIns(scaleFactorReg, new Literal(scaleFactor)));
+        }
+    }
+
+    private void initUpscaleIfNeeded(List<InstructionNode> ins) {
+        if (!additionUpscaleInitialized) {
+            StochasticRegister upscaleReg = getStochasticRegisterForVar(additionUpscaleVariable);
+            additionUpscaleInitialized = true;
+            ins.add(new LoadLiteralIns(upscaleReg, new Literal(0.5)));
+        }
+    }
+
+    private void initInverseScaleIfNeeded(List<InstructionNode> ins) {
+        if (!inverseScaleInitialized) {
+            StochasticRegister inverseScale = getStochasticRegisterForVar(inverseScaleFactorVariable);
+            inverseScaleInitialized = true;
+            ins.add(new LoadLiteralIns(inverseScale, new Literal( 1/((double)scaleFactor))));
         }
     }
 
