@@ -262,6 +262,7 @@ public class CompilerVisitor implements IRReturnVisitor<List<InstructionNode>> {
         conversionIns.add(new StochasticToBinaryIns(tempScaledDownBin, src));
         //upscales back to binary values range -f, f
         BinaryRegister scaleFactorReg = getBinaryRegisterForVar(scaleFactorVariable);
+        initScaleFactorIfNeeded(conversionIns);
         conversionIns.add(new BinaryMul(converted, tempScaledDownBin, scaleFactorReg));
         return conversionIns;
     }
@@ -293,7 +294,18 @@ public class CompilerVisitor implements IRReturnVisitor<List<InstructionNode>> {
 
     @Override
     public List<InstructionNode> visit(IfZero ifZero) {
-        return null;
+        List<InstructionNode> ifz = new LinkedList<>();
+        //jump must have binary cond
+        BinaryRegister arg1;
+        if (!stochasticVariables.contains(ifZero.getCondition())) {
+            arg1 = getBinaryRegisterForVar(ifZero.getCondition());
+        } else {
+            arg1 = new BinaryRegister(getNextRegisterName());
+            StochasticRegister tempArg1 = getStochasticRegisterForVar(ifZero.getCondition());
+            ifz.addAll(convertStochasticToBinary(tempArg1, arg1));
+        }
+        ifz.add(new BinaryJz(new Label(ifZero.getLabel().getName()), arg1));
+        return ifz;
     }
 
     @Override
@@ -305,7 +317,29 @@ public class CompilerVisitor implements IRReturnVisitor<List<InstructionNode>> {
 
     @Override
     public List<InstructionNode> visit(IfNotEquals ifNotEquals) {
-        return null;
+        List<InstructionNode> ifne = new LinkedList<>();
+        //equality check must be performed in binary registers
+        BinaryRegister equalCond = new BinaryRegister(getNextRegisterName());
+        BinaryRegister arg1;
+        BinaryRegister arg2;
+        if (!stochasticVariables.contains(ifNotEquals.getCond1())) {
+            arg1 = getBinaryRegisterForVar(ifNotEquals.getCond1());
+        } else {
+            arg1 = new BinaryRegister(getNextRegisterName());
+            StochasticRegister tempArg1 = getStochasticRegisterForVar(ifNotEquals.getCond1());
+            ifne.addAll(convertStochasticToBinary(tempArg1, arg1));
+        }
+        if (!stochasticVariables.contains(ifNotEquals.getCond2())) {
+            arg2 = getBinaryRegisterForVar(ifNotEquals.getCond2());
+        } else {
+            arg2 = new BinaryRegister(getNextRegisterName());
+            StochasticRegister tempArg2 = getStochasticRegisterForVar(ifNotEquals.getCond2());
+            ifne.addAll(convertStochasticToBinary(tempArg2, arg2));
+        }
+        ifne.add(new BinaryEq(equalCond, arg1, arg2));
+        //if the conds are not equal, equalCond contains 0, and thus we can use it in the jump
+        ifne.add(new BinaryJz(new Label(ifNotEquals.getLabel().getName()), equalCond));
+        return ifne;
     }
 
     @Override
