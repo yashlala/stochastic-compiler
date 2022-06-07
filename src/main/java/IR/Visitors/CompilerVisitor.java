@@ -230,17 +230,21 @@ public class CompilerVisitor implements IRReturnVisitor<List<InstructionNode>> {
 
     private void initUpscaleIfNeeded(List<InstructionNode> ins) {
         if (!additionUpscaleInitialized) {
-            StochasticRegister upscaleReg = getStochasticRegisterForVar(additionUpscaleVariable);
+            BinaryRegister tempReg = new BinaryRegister(getNextRegisterName());
             additionUpscaleInitialized = true;
-            ins.add(new LoadLiteralIns(upscaleReg, new Literal(0.5)));
+            ins.add(new LoadLiteralIns(tempReg, new Literal(scaleFactor/ ((double)2))));
+            StochasticRegister upscaleReg = getStochasticRegisterForVar(additionUpscaleVariable);
+            ins.addAll(convertBinarytoStochastic(tempReg, upscaleReg));
         }
     }
 
     private void initInverseScaleIfNeeded(List<InstructionNode> ins) {
         if (!inverseScaleInitialized) {
-            StochasticRegister inverseScale = getStochasticRegisterForVar(inverseScaleFactorVariable);
+            BinaryRegister tempReg = new BinaryRegister(getNextRegisterName());
             inverseScaleInitialized = true;
-            ins.add(new LoadLiteralIns(inverseScale, new Literal( 1/((double)scaleFactor))));
+            ins.add(new LoadLiteralIns(tempReg, new Literal( 1)));
+            StochasticRegister inverseScale = getStochasticRegisterForVar(inverseScaleFactorVariable);
+            ins.addAll(convertBinarytoStochastic(tempReg, inverseScale));
         }
     }
 
@@ -330,12 +334,54 @@ public class CompilerVisitor implements IRReturnVisitor<List<InstructionNode>> {
 
     @Override
     public List<InstructionNode> visit(Load load) {
-        return null;
+        List<InstructionNode> loadIns = new LinkedList<>();
+        //addresses must be in binary registers
+        BinaryRegister addressReg;
+        if (stochasticVariables.contains(load.getAddress())) {
+            addressReg = new BinaryRegister(getNextRegisterName());
+            StochasticRegister tempAddressReg = getStochasticRegisterForVar(load.getAddress());
+            loadIns.addAll(convertStochasticToBinary(tempAddressReg, addressReg));
+        } else {
+            addressReg = getBinaryRegisterForVar(load.getAddress());
+        }
+        //if binary, we can immediately load value
+        if (!stochasticVariables.contains(load.getDest())) {
+            BinaryRegister destReg = getBinaryRegisterForVar(load.getDest());
+            loadIns.add(new LoadIns(destReg, addressReg));
+        } else {
+            //load into temp then convert to stocastic
+            BinaryRegister tempReg = new BinaryRegister(getNextRegisterName());
+            loadIns.add(new LoadIns(tempReg, addressReg));
+            StochasticRegister destReg = getStochasticRegisterForVar(load.getDest());
+            loadIns.addAll(convertBinarytoStochastic(tempReg, destReg));
+        }
+        return loadIns;
     }
 
     @Override
     public List<InstructionNode> visit(Store store) {
-        return null;
+        List<InstructionNode> storeIns = new LinkedList<>();
+        //addresses must be in binary registers
+        BinaryRegister addressReg;
+        if (stochasticVariables.contains(store.getAddress())) {
+            addressReg = new BinaryRegister(getNextRegisterName());
+            StochasticRegister tempAddressReg = getStochasticRegisterForVar(store.getAddress());
+            storeIns.addAll(convertStochasticToBinary(tempAddressReg, addressReg));
+        } else {
+            addressReg = getBinaryRegisterForVar(store.getAddress());
+        }
+        //if binary, we can immediately store value
+        if (!stochasticVariables.contains(store.getSrc())) {
+            BinaryRegister srcReg = getBinaryRegisterForVar(store.getSrc());
+            storeIns.add(new StoreIns(srcReg, addressReg));
+        } else {
+            //convert to binary, then store
+            StochasticRegister srcStochReg = getStochasticRegisterForVar(store.getSrc());
+            BinaryRegister tempReg = new BinaryRegister(getNextRegisterName());
+            storeIns.addAll(convertStochasticToBinary(srcStochReg, tempReg));
+            storeIns.add(new StoreIns(tempReg, addressReg));
+        }
+        return storeIns;
     }
 
     @Override
