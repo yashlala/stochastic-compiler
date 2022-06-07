@@ -45,9 +45,22 @@ class ISAInterpreterTest {
     }
 
     @Test
+    void zeroRegister() {
+        List<InstructionNode> prg = new ArrayList<InstructionNode>();
+        BinaryRegister zero = new BinaryRegister("zero");
+        prg.add(new PrintIns(zero));
+        prg.add(new LoadLiteralIns(zero, new Literal(3)));
+        prg.add(new PrintIns(zero));
+
+        List<Double> out = toDoubles(ISAInterpreter.getProgramOutput(prg));
+        assertEquals(0, out.get(0), 0.001);
+        assertEquals(0, out.get(1), 0.001);
+    }
+
+    @Test
     void memoryStoreLoad() {
         List<InstructionNode> prg = new ArrayList<InstructionNode>();
-        BinaryRegister addr = new BinaryRegister("a");
+        BinaryRegister addr = new BinaryRegister("addr");
         BinaryRegister val = new BinaryRegister("val");
         prg.add(new LoadLiteralIns(addr, new Literal(100)));
         prg.add(new LoadLiteralIns(val, new Literal(3)));
@@ -62,7 +75,54 @@ class ISAInterpreterTest {
         assertEquals(3, out.get(0));
         assertEquals(3, out.get(1));
     }
-    
+
+    @Test
+    void binaryArithmetic() {
+        List<InstructionNode> prg = new ArrayList<InstructionNode>();
+        BinaryRegister a = new BinaryRegister("a");
+        BinaryRegister b = new BinaryRegister("b");
+        BinaryRegister c = new BinaryRegister("c");
+
+        prg.add(new LoadLiteralIns(a, new Literal(1)));
+        prg.add(new LoadLiteralIns(b, new Literal(2)));
+        prg.add(new LoadLiteralIns(c, new Literal(0)));
+
+        // 1 + 2 = 3
+        prg.add(new BinaryAdd(c, a, b));
+        prg.add(new PrintIns(c));
+
+        // 1 - 2 = -1
+        prg.add(new BinarySub(c, a, b));
+        prg.add(new PrintIns(c));
+
+        // 1 / 2 = 0.5. We reuse the same register here!
+        prg.add(new BinaryDiv(a, a, b));
+        prg.add(new PrintIns(a));
+
+        // 0.5 * 2 = 1
+        prg.add(new BinaryMul(c, a, b));
+        prg.add(new PrintIns(c));
+
+        // (2 < 1 ? 1 : 0) = 0
+        prg.add(new LessThan(a, b, c));
+        prg.add(new PrintIns(a));
+
+        // (0 < 2 ? 1 : 0) = 1
+        prg.add(new LessThan(c, a, b));
+        prg.add(new PrintIns(c));
+
+        List<Double> out = toDoubles(ISAInterpreter.getProgramOutput(prg));
+        assertEquals(3, out.get(0), 0.001);
+        assertEquals(-1, out.get(1), 0.001);
+        assertEquals(0.5, out.get(2), 0.001);
+        assertEquals(1, out.get(3), 0.001);
+        assertEquals(0, out.get(4), 0.001);
+        assertEquals(1, out.get(5), 0.001);
+    }
+
+    @Test
+
+
     private List<Double> toDoubles(List<String> output) {
         List<Double> ret = new ArrayList<>();
         for (String s : output) {
