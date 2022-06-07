@@ -452,7 +452,35 @@ public class CompilerVisitor implements IRReturnVisitor<List<InstructionNode>> {
 
     @Override
     public List<InstructionNode> visit(Equals equals) {
-        return null;
+        List<InstructionNode> eqIns = new LinkedList<>();
+        //equality check must be performed in binary
+        BinaryRegister arg1;
+        BinaryRegister arg2;
+        if (stochasticVariables.contains(equals.getSrc1())) {
+            StochasticRegister temp = getStochasticRegisterForVar(equals.getSrc1());
+            arg1 = new BinaryRegister(getNextRegisterName());
+            eqIns.addAll(convertStochasticToBinary(temp, arg1));
+        } else {
+            arg1 = getBinaryRegisterForVar(equals.getSrc1());
+        }
+        if (stochasticVariables.contains(equals.getSrc2())) {
+            StochasticRegister temp = getStochasticRegisterForVar(equals.getSrc2());
+            arg2 = new BinaryRegister(getNextRegisterName());
+            eqIns.addAll(convertStochasticToBinary(temp, arg2));
+        } else {
+            arg2 = getBinaryRegisterForVar(equals.getSrc2());
+        }
+        //if binary dest, compute directly
+        if (!stochasticVariables.contains(equals.getDest())) {
+            BinaryRegister dest = getBinaryRegisterForVar(equals.getDest());
+            eqIns.add(new BinaryEq(dest, arg1, arg2));
+        } else {
+            BinaryRegister temp = new BinaryRegister(getNextRegisterName());
+            eqIns.add(new BinaryEq(temp, arg1, arg2));
+            StochasticRegister dest = getStochasticRegisterForVar(equals.getDest());
+            eqIns.addAll(convertBinarytoStochastic(temp, dest));
+        }
+        return eqIns;
     }
 
     @Override
