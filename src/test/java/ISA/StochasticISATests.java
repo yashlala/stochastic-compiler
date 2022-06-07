@@ -35,8 +35,7 @@ public class StochasticISATests {
 
         StochasticMul smul = new StochasticMul(new StochasticRegister("smulDest", getPolarity(counter), ++counter),
                 new StochasticRegister("smulSrc1", getPolarity(counter), ++counter),
-                new StochasticRegister("smulSrc2", getPolarity(counter), ++counter),
-                new StochasticRegister("smulScale", getPolarity(counter), ++counter));
+                new StochasticRegister("smulSrc2", getPolarity(counter), ++counter));
         System.out.println(smul);
         instructions.add(smul);
 
