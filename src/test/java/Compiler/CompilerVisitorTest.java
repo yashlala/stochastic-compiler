@@ -1,9 +1,6 @@
 package Compiler;
 
-import IR.IRNodes.Divide;
-import IR.IRNodes.Equals;
-import IR.IRNodes.IRNode;
-import IR.IRNodes.LabelNode;
+import IR.IRNodes.*;
 import IR.Labels.Label;
 import IR.Variables.Variable;
 import IR.Visitors.CompilerVisitor;
@@ -27,21 +24,21 @@ public class CompilerVisitorTest {
         Label label = new Label("JumpHERE");
 
         testIR.add(new LabelNode(new Label("All Bin")));
-        testIR.add(new Equals(binDest, binArg1, binArg2));
+        testIR.add(new LessThan(binDest, binArg1, binArg2));
         testIR.add(new LabelNode(new Label("All Stoch")));
-        testIR.add(new Equals(stochDest, stochArg1, stochArg2));
+        testIR.add(new LessThan(stochDest, stochArg1, stochArg2));
         testIR.add(new LabelNode(new Label("Bin Args, Stoch Dest")));
-        testIR.add(new Equals(stochDest, binArg1, binArg2));
+        testIR.add(new LessThan(stochDest, binArg1, binArg2));
         testIR.add(new LabelNode(new Label("Stoch Args, Bin Dest")));
-        testIR.add(new Equals(binDest, stochArg1, stochArg2));
+        testIR.add(new LessThan(binDest, stochArg1, stochArg2));
         testIR.add(new LabelNode(new Label("Bin Dest, Stoch Arg1")));
-        testIR.add(new Equals(binDest, stochArg1, binArg2));
+        testIR.add(new LessThan(binDest, stochArg1, binArg2));
         testIR.add(new LabelNode(new Label("Bin Dest, Stoch Arg2")));
-        testIR.add(new Equals(binDest, binArg1, stochArg2));
+        testIR.add(new LessThan(binDest, binArg1, stochArg2));
         testIR.add(new LabelNode(new Label("Stoch Dest, Bin Arg1")));
-        testIR.add(new Equals(stochDest, binArg1, stochArg2));
+        testIR.add(new LessThan(stochDest, binArg1, stochArg2));
         testIR.add(new LabelNode(new Label("Stoch Dest, Bin Arg2")));
-        testIR.add(new Equals(stochDest, stochArg1, binArg2));
+        testIR.add(new LessThan(stochDest, stochArg1, binArg2));
 
         PrintVisitor irPrint = new PrintVisitor();
         System.out.println("IR TESTCASE\n");

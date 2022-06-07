@@ -485,7 +485,27 @@ public class CompilerVisitor implements IRReturnVisitor<List<InstructionNode>> {
 
     @Override
     public List<InstructionNode> visit(LessThan lessThan) {
-        return null;
+        List<InstructionNode> ltIns = new LinkedList<>();
+        Register dest;
+        Register arg1;
+        Register arg2;
+        if (stochasticVariables.contains(lessThan.getDest())) {
+            dest = getStochasticRegisterForVar(lessThan.getDest());
+        } else {
+            dest = getBinaryRegisterForVar(lessThan.getDest());
+        }
+        if (stochasticVariables.contains(lessThan.getSrc1())) {
+            arg1 = getStochasticRegisterForVar(lessThan.getSrc1());
+        } else {
+            arg1 = getBinaryRegisterForVar(lessThan.getSrc1());
+        }
+        if (stochasticVariables.contains(lessThan.getSrc2())) {
+            arg2 = getStochasticRegisterForVar(lessThan.getSrc2());
+        } else {
+            arg2 = getBinaryRegisterForVar(lessThan.getSrc2());
+        }
+        ltIns.add(new ISA.InstructionNodes.LessThan(dest, arg1, arg2));
+        return ltIns;
     }
 
     @Override
