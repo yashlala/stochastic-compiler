@@ -1,6 +1,5 @@
 package IR.IRNodes;
 
-import IR.MemoryAddresses.MemoryAddress;
 import IR.Variables.Variable;
 import IR.Visitors.IRReturnVisitor;
 import IR.Visitors.IRVisitor;
@@ -12,7 +11,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class Store implements IRNode {
     @NonNull
-    private final MemoryAddress address;
+    private final Variable address;
     @NonNull
     private final Variable src;
 

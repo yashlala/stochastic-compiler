@@ -1,7 +1,6 @@
 package ISA;
 
 import ISA.InstructionNodes.*;
-import ISA.Memory.MemoryAddress;
 import ISA.Registers.BinaryRegister;
 import ISA.Registers.RegisterPolarity;
 import ISA.Registers.StochasticRegister;
@@ -29,33 +28,13 @@ public class CombinedISATests {
         System.out.println(pB);
         instructions.add(pB);
 
-        LoadIns lBin = new LoadIns(new BinaryRegister("lBinReg"), new MemoryAddress(++counter));
+        LoadIns lBin = new LoadIns(new BinaryRegister("lBinReg"), new BinaryRegister("lMemLoc"));
         System.out.println(lBin);
         instructions.add(lBin);
 
-        LoadIns lU = new LoadIns(new StochasticRegister("lUReg", RegisterPolarity.UNIPOLAR, ++counter),
-                new MemoryAddress(++counter));
-        System.out.println(lU);
-        instructions.add(lU);
-
-        LoadIns lB = new LoadIns(new StochasticRegister("lBReg", RegisterPolarity.BIPOLAR, ++counter),
-                new MemoryAddress(++counter));
-        System.out.println(lB);
-        instructions.add(lB);
-
-        StoreIns sBin = new StoreIns(new BinaryRegister("sBinReg"), new MemoryAddress(++counter));
+        StoreIns sBin = new StoreIns(new BinaryRegister("sBinReg"), new BinaryRegister("sMemLoc"));
         System.out.println(sBin);
         instructions.add(sBin);
-
-        StoreIns sU = new StoreIns(new StochasticRegister("sUReg", RegisterPolarity.UNIPOLAR, ++counter),
-                new MemoryAddress(++counter));
-        System.out.println(sU);
-        instructions.add(sU);
-
-        StoreIns sB = new StoreIns(new StochasticRegister("sBReg", RegisterPolarity.BIPOLAR, ++counter),
-                new MemoryAddress(++counter));
-        System.out.println(sB);
-        instructions.add(sB);
 
         LessThan lt = new LessThan(new BinaryRegister("ltDest"), new BinaryRegister("ltSrc1"),
                 new BinaryRegister("ltSrc2"));

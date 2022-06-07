@@ -1,6 +1,5 @@
 package ISA.InstructionNodes;
 
-import ISA.Registers.BinaryRegister;
 import ISA.Registers.Register;
 import ISA.Registers.StochasticRegister;
 import ISA.Visitors.ISAVisitor;

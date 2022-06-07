@@ -9,7 +9,7 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public class BinaryJz implements InstructionNode{
+public class BinaryJz implements InstructionNode {
     @NonNull
     private final Label label;
 

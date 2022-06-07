@@ -1,8 +1,7 @@
 package ISA.InstructionNodes;
 
 import ISA.Literals.Literal;
-import ISA.Memory.MemoryAddress;
-import ISA.Registers.Register;
+import ISA.Registers.BinaryRegister;
 import ISA.Visitors.ISAVisitor;
 import lombok.Getter;
 import lombok.NonNull;
@@ -12,7 +11,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class LoadLiteralIns implements InstructionNode {
     @NonNull
-    private final Register register;
+    private final BinaryRegister register;
     @NonNull
     private final Literal value;
 
