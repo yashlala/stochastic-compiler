@@ -9,6 +9,8 @@ import java.util.Map;
 
 
 public class RegisterFile {
+    private static final String zeroRegName = "zero";
+
     private final Map<String, BinaryRegister> binaryStore = new HashMap<>();
     private final Map<String, StochasticRegister> stochasticStore = new HashMap<>();
 
@@ -25,6 +27,9 @@ public class RegisterFile {
     }
 
     public BinaryRegister getBinaryReg(String name) {
+        if (name.equals(zeroRegName)) {
+            return new BinaryRegister(zeroRegName, 0);
+        }
         return new BinaryRegister(binaryStore.get(name));
     }
 
@@ -33,6 +38,9 @@ public class RegisterFile {
     }
 
     public StochasticRegister getStochasticReg(String name) {
+        if (name.equals(zeroRegName)) {
+            return new StochasticRegister(zeroRegName, 0, 0);
+        }
         return new StochasticRegister(stochasticStore.get(name));
     }
 
@@ -45,10 +53,16 @@ public class RegisterFile {
     }
 
     public void putReg(BinaryRegister register) {
+        if (register.getName().equals(zeroRegName)) {
+            return;
+        }
         binaryStore.put(register.getName(), new BinaryRegister(register));
     }
 
     public void putReg(StochasticRegister register) {
+        if (register.getName().equals(zeroRegName)) {
+            return;
+        }
         stochasticStore.put(register.getName(), new StochasticRegister((register)));
     }
 
