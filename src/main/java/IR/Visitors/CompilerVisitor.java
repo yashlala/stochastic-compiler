@@ -230,21 +230,17 @@ public class CompilerVisitor implements IRReturnVisitor<List<InstructionNode>> {
 
     private void initUpscaleIfNeeded(List<InstructionNode> ins) {
         if (!additionUpscaleInitialized) {
-            BinaryRegister tempReg = new BinaryRegister(getNextRegisterName());
             additionUpscaleInitialized = true;
-            ins.add(new LoadLiteralIns(tempReg, new Literal(scaleFactor/ ((double)2))));
             StochasticRegister upscaleReg = getStochasticRegisterForVar(additionUpscaleVariable);
-            ins.addAll(convertBinarytoStochastic(tempReg, upscaleReg));
+            ins.add(new LoadLiteralIns(upscaleReg, new Literal(0.5)));
         }
     }
 
     private void initInverseScaleIfNeeded(List<InstructionNode> ins) {
         if (!inverseScaleInitialized) {
-            BinaryRegister tempReg = new BinaryRegister(getNextRegisterName());
             inverseScaleInitialized = true;
-            ins.add(new LoadLiteralIns(tempReg, new Literal( 1)));
             StochasticRegister inverseScale = getStochasticRegisterForVar(inverseScaleFactorVariable);
-            ins.addAll(convertBinarytoStochastic(tempReg, inverseScale));
+            ins.add(new LoadLiteralIns(inverseScale, new Literal( 1/ ((double) scaleFactor))));
         }
     }
 
@@ -349,7 +345,7 @@ public class CompilerVisitor implements IRReturnVisitor<List<InstructionNode>> {
             BinaryRegister destReg = getBinaryRegisterForVar(load.getDest());
             loadIns.add(new LoadIns(destReg, addressReg));
         } else {
-            //load into temp then convert to stocastic
+            //load into temp then convert to stochastic
             BinaryRegister tempReg = new BinaryRegister(getNextRegisterName());
             loadIns.add(new LoadIns(tempReg, addressReg));
             StochasticRegister destReg = getStochasticRegisterForVar(load.getDest());
@@ -386,6 +382,19 @@ public class CompilerVisitor implements IRReturnVisitor<List<InstructionNode>> {
 
     @Override
     public List<InstructionNode> visit(SetLiteral setLiteral) {
-        return null;
+        //since literal is an IR literal, we assume that the literal is a binary constant
+        List<InstructionNode> literalIns = new LinkedList<>();
+        if (!stochasticVariables.contains(setLiteral.getVariable())) {
+            //load directly
+            BinaryRegister varReg = getBinaryRegisterForVar(setLiteral.getVariable());
+            literalIns.add(new LoadLiteralIns(varReg, new Literal(setLiteral.getLiteral().getValue())));
+        } else {
+            //load into temp then convert
+            BinaryRegister tempReg = new BinaryRegister(getNextRegisterName());
+            literalIns.add(new LoadLiteralIns(tempReg, new Literal(setLiteral.getLiteral().getValue())));
+            StochasticRegister destReg = getStochasticRegisterForVar(setLiteral.getVariable());
+            literalIns.addAll(convertBinarytoStochastic(tempReg, destReg));
+        }
+        return literalIns;
     }
 }
