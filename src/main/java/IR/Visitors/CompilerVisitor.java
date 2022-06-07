@@ -136,12 +136,12 @@ public class CompilerVisitor implements IRReturnVisitor<List<InstructionNode>> {
             Register tempDest;
             if (stocharg1) {
                 StochasticRegister src1 = getStochasticRegisterForVar(add.getSrc1());
-                StochasticRegister src2 = getStochasticRegisterForVar(add.getSrc1());
+                StochasticRegister src2 = getStochasticRegisterForVar(add.getSrc2());
                 tempDest = new StochasticRegister(getNextRegisterName(), polarity, bitstreamWidth);
                 ISAadd.addAll(performStochasticAddition((StochasticRegister) tempDest, src1, src2));
             } else {
                 BinaryRegister src1 = getBinaryRegisterForVar(add.getSrc1());
-                BinaryRegister src2 = getBinaryRegisterForVar(add.getSrc1());
+                BinaryRegister src2 = getBinaryRegisterForVar(add.getSrc2());
                 tempDest = new BinaryRegister(getNextRegisterName());
                 ISAadd.add(new BinaryAdd((BinaryRegister) tempDest, src1, src2));
             }
@@ -196,80 +196,88 @@ public class CompilerVisitor implements IRReturnVisitor<List<InstructionNode>> {
         return ISAadd;
     }
 
-    private List<InstructionNode> performStochasticAddition(StochasticRegister dest, StochasticRegister src1, StochasticRegister src2) {
-        List<InstructionNode> additionList = new LinkedList<>();
-        BinaryRegister addSReg = getBinaryRegisterForVar(addS);
-        initAddSIfNeeded(additionList);
-        //addition results in 1/2 of desired value
-        additionList.add(new StochasticAdd(dest, src1, src2, addSReg));
-        //need to divide by 1/2 to get desired value
-        StochasticRegister upscaleFactor = getStochasticRegisterForVar(additionUpscaleVariable);
-        initUpscaleIfNeeded(additionList);
-        StochasticRegister inverseScaleFactor = getStochasticRegisterForVar(inverseScaleFactorVariable);
-        initInverseScaleIfNeeded(additionList);
-        additionList.add(new StochasticDiv(dest, dest, upscaleFactor, inverseScaleFactor));
-        return additionList;
-    }
-
-    private void initAddSIfNeeded(List<InstructionNode> ins) {
-        if (!addSInitialized) {
-            //creates mapping for scaleFactorReg
-            BinaryRegister scaleFactorReg = getBinaryRegisterForVar(addS);
-            addSInitialized = true;
-            ins.add(new LoadLiteralIns(scaleFactorReg, new Literal(0.5)));
-        }
-    }
-
-    private void initScaleFactorIfNeeded(List<InstructionNode> ins) {
-        if (!scaleFactorInitialized) {
-            BinaryRegister scaleFactorReg = getBinaryRegisterForVar(scaleFactorVariable);
-            scaleFactorInitialized = true;
-            ins.add(new LoadLiteralIns(scaleFactorReg, new Literal(scaleFactor)));
-        }
-    }
-
-    private void initUpscaleIfNeeded(List<InstructionNode> ins) {
-        if (!additionUpscaleInitialized) {
-            additionUpscaleInitialized = true;
-            StochasticRegister upscaleReg = getStochasticRegisterForVar(additionUpscaleVariable);
-            ins.add(new LoadLiteralIns(upscaleReg, new Literal(0.5)));
-        }
-    }
-
-    private void initInverseScaleIfNeeded(List<InstructionNode> ins) {
-        if (!inverseScaleInitialized) {
-            inverseScaleInitialized = true;
-            StochasticRegister inverseScale = getStochasticRegisterForVar(inverseScaleFactorVariable);
-            ins.add(new LoadLiteralIns(inverseScale, new Literal( 1/ ((double) scaleFactor))));
-        }
-    }
-
-    private List<InstructionNode> convertBinarytoStochastic(BinaryRegister src, StochasticRegister converted) {
-        List<InstructionNode> conversionIns = new LinkedList<>();
-        BinaryRegister scaleFactorReg = getBinaryRegisterForVar(scaleFactorVariable);
-        initScaleFactorIfNeeded(conversionIns);
-        //scale down the binary value into -1,1 range
-        BinaryRegister scaledDownBin = new BinaryRegister(getNextRegisterName());
-        conversionIns.add(new BinaryDiv(scaledDownBin, src, scaleFactorReg));
-        //convert to stochastic register
-        conversionIns.add(new BinaryToStochasticIns(converted, src));
-        return conversionIns;
-    }
-
-    private List<InstructionNode> convertStochasticToBinary(StochasticRegister src, BinaryRegister converted) {
-        List<InstructionNode> conversionIns = new LinkedList<>();
-        BinaryRegister tempScaledDownBin = new BinaryRegister(getNextRegisterName());
-        conversionIns.add(new StochasticToBinaryIns(tempScaledDownBin, src));
-        //upscales back to binary values range -f, f
-        BinaryRegister scaleFactorReg = getBinaryRegisterForVar(scaleFactorVariable);
-        initScaleFactorIfNeeded(conversionIns);
-        conversionIns.add(new BinaryMul(converted, tempScaledDownBin, scaleFactorReg));
-        return conversionIns;
-    }
-
     @Override
     public List<InstructionNode> visit(Subtract subtract) {
-        return null;
+        List<InstructionNode> subIns = new LinkedList<>();
+        boolean stochDest = stochasticVariables.contains(subtract.getDest());
+        boolean stocharg1 = stochasticVariables.contains(subtract.getSrc1());
+        boolean stocharg2 = stochasticVariables.contains(subtract.getSrc2());
+
+        if (!(stochDest || stocharg1 || stocharg2)) {
+            //if all arguments are binary, perform binary subtraction
+            BinaryRegister dest = getBinaryRegisterForVar(subtract.getDest());
+            BinaryRegister src1 = getBinaryRegisterForVar(subtract.getSrc1());
+            BinaryRegister src2 = getBinaryRegisterForVar(subtract.getSrc2());
+            subIns.add(new BinarySub(dest, src1, src2));
+        } else if (stochDest && stocharg1 && stocharg2) {
+            //if all arguments are stochastic, perform stochastic subtraction
+            StochasticRegister dest = getStochasticRegisterForVar(subtract.getDest());
+            StochasticRegister src1 = getStochasticRegisterForVar(subtract.getSrc1());
+            StochasticRegister src2 = getStochasticRegisterForVar(subtract.getSrc2());
+            subIns.addAll(performStochasticSubtraction(dest, src1, src2));
+        } else if (stocharg1 == stocharg2) {
+            //if srcs agree on type, perform relevant operation then cast to dest type
+            Register tempDest;
+            if (stocharg1) {
+                StochasticRegister src1 = getStochasticRegisterForVar(subtract.getSrc1());
+                StochasticRegister src2 = getStochasticRegisterForVar(subtract.getSrc2());
+                tempDest = new StochasticRegister(getNextRegisterName(), polarity, bitstreamWidth);
+                subIns.addAll(performStochasticSubtraction((StochasticRegister) tempDest, src1, src2));
+            } else {
+                BinaryRegister src1 = getBinaryRegisterForVar(subtract.getSrc1());
+                BinaryRegister src2 = getBinaryRegisterForVar(subtract.getSrc2());
+                tempDest = new BinaryRegister(getNextRegisterName());
+                subIns.add(new BinarySub((BinaryRegister) tempDest, src1, src2));
+            }
+            //invariant, dest reg is opposite of tempDest
+            if (stochDest) {
+                StochasticRegister dest = getStochasticRegisterForVar(subtract.getDest());
+                subIns.addAll(convertBinarytoStochastic((BinaryRegister) tempDest, dest));
+            } else {
+                BinaryRegister dest = getBinaryRegisterForVar(subtract.getDest());
+                subIns.addAll(convertStochasticToBinary((StochasticRegister) tempDest, dest));
+            }
+        } else {
+            //src disagree on type, so convert to dest type
+            if (stochDest) {
+                StochasticRegister dest = getStochasticRegisterForVar(subtract.getDest());
+                StochasticRegister src1;
+                StochasticRegister src2;
+                if (stocharg1) {
+                    src1 = getStochasticRegisterForVar(subtract.getSrc1());
+                    //guaranteed src2 is binary
+                    src2 = new StochasticRegister(getNextRegisterName(), polarity, bitstreamWidth);
+                    BinaryRegister tempSrc2 = getBinaryRegisterForVar(subtract.getSrc2());
+                    subIns.addAll(convertBinarytoStochastic(tempSrc2, src2));
+                } else {
+                    src2 = getStochasticRegisterForVar(subtract.getSrc2());
+                    //guaranteed src1 is binary
+                    src1 = new StochasticRegister(getNextRegisterName(), polarity, bitstreamWidth);
+                    BinaryRegister tempSrc1 = getBinaryRegisterForVar(subtract.getSrc1());
+                    subIns.addAll(convertBinarytoStochastic(tempSrc1, src1));
+                }
+                subIns.addAll(performStochasticSubtraction(dest, src1, src2));
+            } else {
+                BinaryRegister dest = getBinaryRegisterForVar(subtract.getDest());
+                BinaryRegister src1;
+                BinaryRegister src2;
+                if (!stocharg1) {
+                    src1 = getBinaryRegisterForVar(subtract.getSrc1());
+                    //guaranteed src2 is stoch
+                    src2 = new BinaryRegister(getNextRegisterName());
+                    StochasticRegister tempSrc2 = getStochasticRegisterForVar(subtract.getSrc2());
+                    subIns.addAll(convertStochasticToBinary(tempSrc2, src2));
+                } else {
+                    src2 = getBinaryRegisterForVar(subtract.getSrc2());
+                    //guaranteed src1 is stoch
+                    src1 = new BinaryRegister(getNextRegisterName());
+                    StochasticRegister tempSrc1 = getStochasticRegisterForVar(subtract.getSrc1());
+                    subIns.addAll(convertStochasticToBinary(tempSrc1, src1));
+                }
+                subIns.add(new BinarySub(dest, src1, src2));
+            }
+        }
+        return subIns;
     }
 
     @Override
@@ -431,4 +439,100 @@ public class CompilerVisitor implements IRReturnVisitor<List<InstructionNode>> {
         }
         return literalIns;
     }
+
+    private void initAddSIfNeeded(List<InstructionNode> ins) {
+        if (!addSInitialized) {
+            //creates mapping for scaleFactorReg
+            BinaryRegister scaleFactorReg = getBinaryRegisterForVar(addS);
+            addSInitialized = true;
+            ins.add(new LoadLiteralIns(scaleFactorReg, new Literal(0.5)));
+        }
+    }
+
+    private void initScaleFactorIfNeeded(List<InstructionNode> ins) {
+        if (!scaleFactorInitialized) {
+            BinaryRegister scaleFactorReg = getBinaryRegisterForVar(scaleFactorVariable);
+            scaleFactorInitialized = true;
+            ins.add(new LoadLiteralIns(scaleFactorReg, new Literal(scaleFactor)));
+        }
+    }
+
+    private void initUpscaleIfNeeded(List<InstructionNode> ins) {
+        if (!additionUpscaleInitialized) {
+            additionUpscaleInitialized = true;
+            StochasticRegister upscaleReg = getStochasticRegisterForVar(additionUpscaleVariable);
+            ins.add(new LoadLiteralIns(upscaleReg, new Literal(0.5)));
+        }
+    }
+
+    private void initInverseScaleIfNeeded(List<InstructionNode> ins) {
+        if (!inverseScaleInitialized) {
+            inverseScaleInitialized = true;
+            StochasticRegister inverseScale = getStochasticRegisterForVar(inverseScaleFactorVariable);
+            ins.add(new LoadLiteralIns(inverseScale, new Literal( 1/ ((double) scaleFactor))));
+        }
+    }
+
+    private List<InstructionNode> convertBinarytoStochastic(BinaryRegister src, StochasticRegister converted) {
+        List<InstructionNode> conversionIns = new LinkedList<>();
+        BinaryRegister scaleFactorReg = getBinaryRegisterForVar(scaleFactorVariable);
+        initScaleFactorIfNeeded(conversionIns);
+        //scale down the binary value into -1,1 range
+        BinaryRegister scaledDownBin = new BinaryRegister(getNextRegisterName());
+        conversionIns.add(new BinaryDiv(scaledDownBin, src, scaleFactorReg));
+        //convert to stochastic register
+        conversionIns.add(new BinaryToStochasticIns(converted, src));
+        return conversionIns;
+    }
+
+    private List<InstructionNode> convertStochasticToBinary(StochasticRegister src, BinaryRegister converted) {
+        List<InstructionNode> conversionIns = new LinkedList<>();
+        BinaryRegister tempScaledDownBin = new BinaryRegister(getNextRegisterName());
+        conversionIns.add(new StochasticToBinaryIns(tempScaledDownBin, src));
+        //upscales back to binary values range -f, f
+        BinaryRegister scaleFactorReg = getBinaryRegisterForVar(scaleFactorVariable);
+        initScaleFactorIfNeeded(conversionIns);
+        conversionIns.add(new BinaryMul(converted, tempScaledDownBin, scaleFactorReg));
+        return conversionIns;
+    }
+
+    private List<InstructionNode> performStochasticAddition(StochasticRegister dest, StochasticRegister src1, StochasticRegister src2) {
+        List<InstructionNode> additionList = new LinkedList<>();
+        BinaryRegister addSReg = getBinaryRegisterForVar(addS);
+        initAddSIfNeeded(additionList);
+        //addition results in 1/2 of desired value
+        additionList.add(new StochasticAdd(dest, src1, src2, addSReg));
+        //need to divide by 1/2 to get desired value
+        StochasticRegister upscaleFactor = getStochasticRegisterForVar(additionUpscaleVariable);
+        initUpscaleIfNeeded(additionList);
+        StochasticRegister inverseScaleFactor = getStochasticRegisterForVar(inverseScaleFactorVariable);
+        initInverseScaleIfNeeded(additionList);
+        additionList.add(new StochasticDiv(dest, dest, upscaleFactor, inverseScaleFactor));
+        return additionList;
+    }
+
+    private List<InstructionNode> performStochasticSubtraction(StochasticRegister dest, StochasticRegister src1, StochasticRegister src2) {
+        List<InstructionNode> subList = new LinkedList<>();
+        BinaryRegister addSReg = getBinaryRegisterForVar(addS);
+        initAddSIfNeeded(subList);
+        //subtraction results in 1/2 of desired value
+        subList.add(new StochasticSub(dest, src1, src2, addSReg));
+        //need to divide by 1/2 to get desired value
+        StochasticRegister upscaleFactor = getStochasticRegisterForVar(additionUpscaleVariable);
+        initUpscaleIfNeeded(subList);
+        StochasticRegister inverseScaleFactor = getStochasticRegisterForVar(inverseScaleFactorVariable);
+        initInverseScaleIfNeeded(subList);
+        subList.add(new StochasticDiv(dest, dest, upscaleFactor, inverseScaleFactor));
+        return subList;
+    }
+
+//    private List<InstructionNode> performStochasticMultiplication(StochasticRegister dest, StochasticRegister src1, StochasticRegister src2) {
+//        List<InstructionNode> mulList = new LinkedList<>();
+//        //multiplication results in 1/f of desired value
+//        mulList.add(new StochasticMul(dest, src1, src2, addSReg));
+//        StochasticRegister inverseScaleFactor = getStochasticRegisterForVar(inverseScaleFactorVariable);
+//        initInverseScaleIfNeeded(subList);
+//        subList.add(new StochasticDiv(dest, dest, upscaleFactor, inverseScaleFactor));
+//        return subList;
+//    }
 }
