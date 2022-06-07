@@ -7,6 +7,7 @@ import ISAInterpreter.Registers.BinaryRegister;
 import ISAInterpreter.Registers.Register;
 import ISAInterpreter.Registers.StochasticRegister;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,12 +19,14 @@ public class ExecutionVisitor implements ISAVisitor {
     private final RegisterFile regFile = new RegisterFile();
     private final MemoryBank memoryBank = new MemoryBank();
     private Map<Label, Integer> labelMap = new HashMap<>();
+    private final List<String> consoleOutput = new ArrayList<>();
     private int programCounter;
 
 
-    public void executeProgram(List<InstructionNode> instructions, Map<Label, Integer> labelIndex) {
+    public List<String> executeProgram(List<InstructionNode> instructions, Map<Label, Integer> labelIndex) {
         regFile.clear();
         memoryBank.clear();
+        consoleOutput.clear();
         labelMap = new HashMap<>(labelIndex);
         programCounter = 0;
 
@@ -37,6 +40,8 @@ public class ExecutionVisitor implements ISAVisitor {
             instructions.get(programCounter).accept(this);
             programCounter++;
         }
+
+        return consoleOutput;
     }
 
     @Override
@@ -169,7 +174,7 @@ public class ExecutionVisitor implements ISAVisitor {
 
     @Override
     public void visit(PrintIns printIns) {
-        System.out.println(printIns.getRegister());
+        consoleOutput.add(regFile.getReg(printIns.getRegister()).toString());
     }
 
     @Override
