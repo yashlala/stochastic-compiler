@@ -24,10 +24,12 @@ public class CompilerVisitor implements IRReturnVisitor<List<InstructionNode>> {
     private final Variable scaleFactorVariable = new Variable("$scaleFactor");
     private final Variable inverseScaleFactorVariable = new Variable("$inverseScaleFactor");
     private final Variable additionUpscaleVariable = new Variable("$additionUpscale");
+    private final Variable stochasticOneVariable = new Variable("$one");
     private boolean scaleFactorInitialized = false;
     private boolean addSInitialized = false;
     private boolean additionUpscaleInitialized = false;
     private boolean inverseScaleInitialized = false;
+    private boolean stochasticOneInitialized = false;
 
     @NonNull
     private final ImmutableSet<Variable> stochasticVariables;
@@ -465,6 +467,14 @@ public class CompilerVisitor implements IRReturnVisitor<List<InstructionNode>> {
         }
     }
 
+    private void initStochasticOneIfNeeded(List<InstructionNode> ins) {
+        if (!stochasticOneInitialized) {
+            stochasticOneInitialized = true;
+            StochasticRegister oneReg = getStochasticRegisterForVar(stochasticOneVariable);
+            ins.add(new LoadLiteralIns(oneReg, new Literal(1)));
+        }
+    }
+
     private void initInverseScaleIfNeeded(List<InstructionNode> ins) {
         if (!inverseScaleInitialized) {
             inverseScaleInitialized = true;
@@ -505,9 +515,9 @@ public class CompilerVisitor implements IRReturnVisitor<List<InstructionNode>> {
         //need to divide by 1/2 to get desired value
         StochasticRegister upscaleFactor = getStochasticRegisterForVar(additionUpscaleVariable);
         initUpscaleIfNeeded(additionList);
-        StochasticRegister inverseScaleFactor = getStochasticRegisterForVar(inverseScaleFactorVariable);
-        initInverseScaleIfNeeded(additionList);
-        additionList.add(new StochasticDiv(dest, dest, upscaleFactor, inverseScaleFactor));
+        StochasticRegister one = getStochasticRegisterForVar(stochasticOneVariable);
+        initStochasticOneIfNeeded(additionList);
+        additionList.add(new StochasticDiv(dest, dest, upscaleFactor, one));
         return additionList;
     }
 
@@ -520,19 +530,21 @@ public class CompilerVisitor implements IRReturnVisitor<List<InstructionNode>> {
         //need to divide by 1/2 to get desired value
         StochasticRegister upscaleFactor = getStochasticRegisterForVar(additionUpscaleVariable);
         initUpscaleIfNeeded(subList);
-        StochasticRegister inverseScaleFactor = getStochasticRegisterForVar(inverseScaleFactorVariable);
-        initInverseScaleIfNeeded(subList);
-        subList.add(new StochasticDiv(dest, dest, upscaleFactor, inverseScaleFactor));
+        StochasticRegister one = getStochasticRegisterForVar(stochasticOneVariable);
+        initStochasticOneIfNeeded(subList);
+        subList.add(new StochasticDiv(dest, dest, upscaleFactor, one));
         return subList;
     }
 
-//    private List<InstructionNode> performStochasticMultiplication(StochasticRegister dest, StochasticRegister src1, StochasticRegister src2) {
-//        List<InstructionNode> mulList = new LinkedList<>();
-//        //multiplication results in 1/f of desired value
-//        mulList.add(new StochasticMul(dest, src1, src2, addSReg));
-//        StochasticRegister inverseScaleFactor = getStochasticRegisterForVar(inverseScaleFactorVariable);
-//        initInverseScaleIfNeeded(subList);
-//        subList.add(new StochasticDiv(dest, dest, upscaleFactor, inverseScaleFactor));
-//        return subList;
-//    }
+    private List<InstructionNode> performStochasticMultiplication(StochasticRegister dest, StochasticRegister src1, StochasticRegister src2) {
+        List<InstructionNode> mulList = new LinkedList<>();
+        //multiplication results in 1/f of desired value
+        mulList.add(new StochasticMul(dest, src1, src2));
+        StochasticRegister inverseScaleFactor = getStochasticRegisterForVar(inverseScaleFactorVariable);
+        initInverseScaleIfNeeded(mulList);
+        StochasticRegister one = getStochasticRegisterForVar(stochasticOneVariable);
+        initStochasticOneIfNeeded(mulList);
+        mulList.add(new StochasticDiv(dest, dest, inverseScaleFactor, one));
+        return mulList;
+    }
 }
