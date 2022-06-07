@@ -191,7 +191,7 @@ public class StochasticRegister implements Register {
 
     private static BitSet encode(double value, int frameSize, RegisterPolarity polarity) {
         if (!inRange(value, polarity)) {
-            throw new RuntimeException("Cannot encode stochastic bistream; value out of range");
+            throw new RuntimeException("Cannot encode stochastic bitstream; value out of range");
         }
 
         double fractionOfOnes;
