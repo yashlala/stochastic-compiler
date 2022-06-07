@@ -15,6 +15,9 @@ public class RegisterFile {
     private final Map<String, StochasticRegister> stochasticStore = new HashMap<>();
 
     public Register getReg(String name) {
+        if (name.equals(zeroRegName)) {
+            return new BinaryRegister("zero", 0);
+        }
         if (binaryStore.containsKey(name)) {
             return binaryStore.get(name);
         } else {
