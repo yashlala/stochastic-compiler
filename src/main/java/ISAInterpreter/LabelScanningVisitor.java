@@ -4,6 +4,7 @@ import ISA.InstructionNodes.*;
 import ISA.Labels.Label;
 import ISA.Visitors.ISAVisitor;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -12,7 +13,7 @@ public class LabelScanningVisitor implements ISAVisitor {
     private int index;
 
     public Map<Label, Integer> buildLabelIndex(List<InstructionNode> instructions) {
-        labelIndex.clear();
+        labelIndex = new HashMap<Label, Integer>();
         for (index = 0; index < instructions.size(); index++) {
             instructions.get(index).accept(this);
         }
