@@ -198,7 +198,7 @@ public class StochasticRegister implements Register {
         if (polarity == RegisterPolarity.UNIPOLAR) {
             fractionOfOnes = value;
         } else if (polarity == RegisterPolarity.BIPOLAR) {
-            fractionOfOnes = 2 * value - 1;
+            fractionOfOnes = (value + 1) / 2;
         } else {
             throw new RuntimeException("Unknown Polarity Type Encountered");
         }
@@ -231,7 +231,7 @@ public class StochasticRegister implements Register {
         if (polarity == RegisterPolarity.UNIPOLAR) {
             return fractionOfOnes;
         } else if (polarity == RegisterPolarity.BIPOLAR) {
-            return (fractionOfOnes + 1) / 2;
+            return (2 * fractionOfOnes) - 1;
         } else {
             throw new RuntimeException("Unknown Polarity Type Encountered");
         }
