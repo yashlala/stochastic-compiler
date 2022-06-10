@@ -13,8 +13,6 @@ import java.util.concurrent.ThreadLocalRandom;
 
 
 public class StochasticRegister implements Register {
-    public static final double NOISE_COEFFICIENT = 0;
-
     @Getter
     @Setter
     private String name;
@@ -54,46 +52,47 @@ public class StochasticRegister implements Register {
     }
 
     public static void add(StochasticRegister dest, StochasticRegister src1,
-                           StochasticRegister src2, Register scale) {
+                           StochasticRegister src2, Register scale, double noiseCoefficient) {
         double scaleVal = scale.toDouble();
 
         double destVal = (src1.toDouble() * scaleVal) + ((1 - scaleVal) * src2.toDouble());
         checkAssignValue(dest, destVal);
-        addNoise(dest.bitSet, dest.getFrameSize(), NOISE_COEFFICIENT);
+        addNoise(dest.bitSet, dest.getFrameSize(), noiseCoefficient);
     }
 
     public static void subtract(StochasticRegister dest, StochasticRegister src1,
-                                StochasticRegister src2, Register scale) {
+                                StochasticRegister src2, Register scale, double noiseCoefficient) {
         double scaleVal = scale.toDouble();
         double destVal = (src1.toDouble() * scaleVal) - ((1 - scaleVal) * src2.toDouble());
         checkAssignValue(dest, destVal);
-        addNoise(dest.bitSet, dest.getFrameSize(), NOISE_COEFFICIENT);
+        addNoise(dest.bitSet, dest.getFrameSize(), noiseCoefficient);
     }
 
-    public static void multiply(StochasticRegister dest, StochasticRegister src1, StochasticRegister src2) {
+    public static void multiply(StochasticRegister dest, StochasticRegister src1, StochasticRegister src2,
+                                double noiseCoefficient) {
         double destVal = (src1.toDouble() * src2.toDouble());
         checkAssignValue(dest, destVal);
-        addNoise(dest.bitSet, dest.getFrameSize(), NOISE_COEFFICIENT);
+        addNoise(dest.bitSet, dest.getFrameSize(), noiseCoefficient);
     }
 
     public static void divide(StochasticRegister dest, StochasticRegister src1,
-                              StochasticRegister src2, Register scale) {
+                              StochasticRegister src2, Register scale, double noiseCoefficient) {
         double scaleVal = scale.toDouble();
         double destVal = src1.toDouble() / src2.toDouble() * scaleVal;
         saturateAssignValue(dest, destVal);
-        addNoise(dest.bitSet, dest.getFrameSize(), NOISE_COEFFICIENT);
+        addNoise(dest.bitSet, dest.getFrameSize(), noiseCoefficient);
     }
 
-    public static void exp(StochasticRegister dest, StochasticRegister src) {
+    public static void exp(StochasticRegister dest, StochasticRegister src, double noiseCoefficient) {
         double destVal = Math.exp(src.toDouble());
         checkAssignValue(dest, destVal);
-        addNoise(dest.bitSet, dest.getFrameSize(), NOISE_COEFFICIENT);
+        addNoise(dest.bitSet, dest.getFrameSize(), noiseCoefficient);
     }
 
-    public static void tanh(StochasticRegister dest, StochasticRegister src) {
+    public static void tanh(StochasticRegister dest, StochasticRegister src, double stochasticRegister) {
         double destVal = Math.tanh(src.toDouble());
         checkAssignValue(dest, destVal);
-        addNoise(dest.bitSet, dest.getFrameSize(), NOISE_COEFFICIENT);
+        addNoise(dest.bitSet, dest.getFrameSize(), stochasticRegister);
     }
 
     private static void checkAssignValue(StochasticRegister register, double value) {

@@ -21,14 +21,18 @@ public class ExecutionVisitor implements ISAVisitor {
     private Map<Label, Integer> labelMap = new HashMap<>();
     private final List<String> consoleOutput = new ArrayList<>();
     private int programCounter;
+    private double noiseCoefficient;
 
 
-    public List<String> executeProgram(List<InstructionNode> instructions, Map<Label, Integer> labelIndex) {
+    public List<String> executeProgram(List<InstructionNode> instructions,
+                                       Map<Label, Integer> labelIndex, double noiseCoefficient) {
         regFile.clear();
         memoryBank.clear();
         consoleOutput.clear();
         labelMap = new HashMap<>(labelIndex);
+        this.noiseCoefficient = noiseCoefficient;
         programCounter = 0;
+
 
         while (programCounter != instructions.size()) {
             if (programCounter < 0 || programCounter > instructions.size()) {
@@ -123,7 +127,7 @@ public class ExecutionVisitor implements ISAVisitor {
         StochasticRegister src2 = regFile.getStochasticReg(stochasticAdd.getSrc2());
         Register scale = regFile.getReg(stochasticAdd.getScale());
         StochasticRegister dest = new StochasticRegister(stochasticAdd.getDest());
-        StochasticRegister.add(dest, src1, src2, scale);
+        StochasticRegister.add(dest, src1, src2, scale, noiseCoefficient);
         regFile.putReg(dest);
     }
 
@@ -133,7 +137,7 @@ public class ExecutionVisitor implements ISAVisitor {
         StochasticRegister src2 = regFile.getStochasticReg(stochasticSub.getSrc2());
         Register scale = regFile.getReg(stochasticSub.getScale());
         StochasticRegister dest = new StochasticRegister(stochasticSub.getDest());
-        StochasticRegister.subtract(dest, src1, src2, scale);
+        StochasticRegister.subtract(dest, src1, src2, scale, noiseCoefficient);
         regFile.putReg(dest);
     }
 
@@ -142,7 +146,7 @@ public class ExecutionVisitor implements ISAVisitor {
         StochasticRegister src1 = regFile.getStochasticReg(stochasticMul.getSrc1());
         StochasticRegister src2 = regFile.getStochasticReg(stochasticMul.getSrc2());
         StochasticRegister dest = new StochasticRegister(stochasticMul.getDest());
-        StochasticRegister.multiply(dest, src1, src2);
+        StochasticRegister.multiply(dest, src1, src2, noiseCoefficient);
         regFile.putReg(dest);
     }
 
@@ -152,7 +156,7 @@ public class ExecutionVisitor implements ISAVisitor {
         StochasticRegister src2 = regFile.getStochasticReg(stochasticDiv.getSrc2());
         Register scale = regFile.getReg(stochasticDiv.getScale());
         StochasticRegister dest = new StochasticRegister(stochasticDiv.getDest());
-        StochasticRegister.divide(dest, src1, src2, scale);
+        StochasticRegister.divide(dest, src1, src2, scale, noiseCoefficient);
         regFile.putReg(dest);
     }
 
@@ -160,7 +164,7 @@ public class ExecutionVisitor implements ISAVisitor {
     public void visit(StochasticExp stochasticExp) {
         StochasticRegister src = regFile.getStochasticReg(stochasticExp.getSrc1());
         StochasticRegister dest = new StochasticRegister(stochasticExp.getDest());
-        StochasticRegister.exp(dest, src);
+        StochasticRegister.exp(dest, src, noiseCoefficient);
         regFile.putReg(dest);
     }
 
@@ -168,7 +172,7 @@ public class ExecutionVisitor implements ISAVisitor {
     public void visit(StochasticTanh stochasticTanh) {
         StochasticRegister src = regFile.getStochasticReg(stochasticTanh.getSrc1());
         StochasticRegister dest = new StochasticRegister(stochasticTanh.getDest());
-        StochasticRegister.tanh(dest, src);
+        StochasticRegister.tanh(dest, src, noiseCoefficient);
         regFile.putReg(dest);
     }
 

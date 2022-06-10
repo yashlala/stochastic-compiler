@@ -15,7 +15,7 @@ class ISAInterpreterTest {
     @Test
     void emptyProgram() {
         List<InstructionNode> prg = new ArrayList<InstructionNode>();
-        List<String> out = ISAInterpreter.getProgramOutput(prg);
+        List<String> out = ISAInterpreter.getProgramOutput(prg, 0);
         assertEquals(out.size(), 0);
     }
 
@@ -26,7 +26,7 @@ class ISAInterpreterTest {
         prg.add(new LoadLiteralIns(a, new Literal(3)));
         prg.add(new PrintIns(a));
 
-        List<Double> out = toDoubles(ISAInterpreter.getProgramOutput(prg));
+        List<Double> out = toDoubles(ISAInterpreter.getProgramOutput(prg, 0));
         assertEquals(out.size(), 1);
         assertEquals(3, out.get(0), 0.001);
     }
@@ -39,7 +39,7 @@ class ISAInterpreterTest {
         prg.add(new LoadLiteralIns(a, new Literal(4)));
         prg.add(new PrintIns(a));
 
-        List<Double> out = toDoubles(ISAInterpreter.getProgramOutput(prg));
+        List<Double> out = toDoubles(ISAInterpreter.getProgramOutput(prg, 0));
         assertEquals(1, out.size());
         assertEquals(4, out.get(0), 0.001);
     }
@@ -52,7 +52,7 @@ class ISAInterpreterTest {
         prg.add(new LoadLiteralIns(zero, new Literal(3)));
         prg.add(new PrintIns(zero));
 
-        List<Double> out = toDoubles(ISAInterpreter.getProgramOutput(prg));
+        List<Double> out = toDoubles(ISAInterpreter.getProgramOutput(prg, 0));
         assertEquals(0, out.get(0), 0.001);
         assertEquals(0, out.get(1), 0.001);
     }
@@ -70,7 +70,7 @@ class ISAInterpreterTest {
         prg.add(new LoadIns(val, addr));
         prg.add(new PrintIns(val));
 
-        List<Double> out = toDoubles(ISAInterpreter.getProgramOutput(prg));
+        List<Double> out = toDoubles(ISAInterpreter.getProgramOutput(prg, 0));
         assertEquals(out.size(), 2);
         assertEquals(3, out.get(0));
         assertEquals(3, out.get(1));
@@ -111,7 +111,7 @@ class ISAInterpreterTest {
         prg.add(new LessThan(c, a, b));
         prg.add(new PrintIns(c));
 
-        List<Double> out = toDoubles(ISAInterpreter.getProgramOutput(prg));
+        List<Double> out = toDoubles(ISAInterpreter.getProgramOutput(prg, 0));
         assertEquals(3, out.get(0), 0.001);
         assertEquals(-1, out.get(1), 0.001);
         assertEquals(0.5, out.get(2), 0.001);

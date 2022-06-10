@@ -18,7 +18,7 @@ class StochasticRegisterTest {
         StochasticRegister b = new StochasticRegister("b", 0.5, 10, RegisterPolarity.BIPOLAR);
         StochasticRegister out = new StochasticRegister("out", 0, 10, RegisterPolarity.BIPOLAR);
 
-        StochasticRegister.add(out, a, zero, scale);
+        StochasticRegister.add(out, a, zero, scale, 0);
         assertEquals(0.5 * 0.5, out.toDouble(), 0.25);
     }
 
@@ -30,13 +30,13 @@ class StochasticRegisterTest {
         StochasticRegister b = new StochasticRegister("b", 0.5, 20, RegisterPolarity.BIPOLAR);
         StochasticRegister out = new StochasticRegister("out", 0, 20, RegisterPolarity.BIPOLAR);
 
-        StochasticRegister.add(out, a, zero, scale);
+        StochasticRegister.add(out, a, zero, scale, 0);
         assertEquals(0.35 * 0.5, out.toDouble(), 0.1);
 
-        StochasticRegister.subtract(out, zero, a, scale);
+        StochasticRegister.subtract(out, zero, a, scale, 0);
         assertEquals((0 * .35) - ((1 - .35) * .5), out.toDouble(), 0.1);
 
-        StochasticRegister.divide(out, a, b, scale);
+        StochasticRegister.divide(out, a, b, scale, 0);
         assertEquals(0.35 * 0.5 / 0.5, out.toDouble(), 0.1);
     }
     @Test
@@ -47,16 +47,16 @@ class StochasticRegisterTest {
         StochasticRegister b = new StochasticRegister("b", 0.5, 20, RegisterPolarity.BIPOLAR);
         StochasticRegister out = new StochasticRegister("out", 0, 20, RegisterPolarity.BIPOLAR);
 
-        StochasticRegister.add(out, a, zero, scale);
+        StochasticRegister.add(out, a, zero, scale, 0);
         assertEquals(0.5 * 0.5, out.toDouble(), 0.1);
 
-        StochasticRegister.subtract(out, zero, a, scale);
+        StochasticRegister.subtract(out, zero, a, scale, 0);
         assertEquals((0 - 0.5) * 0.5, out.toDouble(), 0.1);
 
-        StochasticRegister.multiply(out, a, b);
+        StochasticRegister.multiply(out, a, b, 0);
         assertEquals(0.5 * 0.5, out.toDouble(), 0.1);
 
-        StochasticRegister.divide(out, a, b, scale);
+        StochasticRegister.divide(out, a, b, scale, 0);
         assertEquals(0.5 * 0.5 / 0.5, out.toDouble(), 0.1);
     }
 
@@ -68,16 +68,16 @@ class StochasticRegisterTest {
         StochasticRegister b = new StochasticRegister("b", 0.5, 20, RegisterPolarity.UNIPOLAR);
         StochasticRegister out = new StochasticRegister("out", 0, 20, RegisterPolarity.BIPOLAR);
 
-        StochasticRegister.add(out, a, zero, scale);
+        StochasticRegister.add(out, a, zero, scale, 0);
         assertEquals(0.5 * 0.5, out.toDouble(), 0.1);
 
-        StochasticRegister.subtract(out, zero, a, scale);
+        StochasticRegister.subtract(out, zero, a, scale, 0);
         assertEquals((0 - 0.5) * 0.5, out.toDouble(), 0.1);
 
-        StochasticRegister.multiply(out, a, b);
+        StochasticRegister.multiply(out, a, b, 0);
         assertEquals(0.5 * 0.5, out.toDouble(), 0.1);
 
-        StochasticRegister.divide(out, a, b, scale);
+        StochasticRegister.divide(out, a, b, scale, 0);
         assertEquals(0.5 * 0.5 / 0.5, out.toDouble(), 0.1);
 
         zero = new StochasticRegister("zero", 0, 20, RegisterPolarity.BIPOLAR);
@@ -86,16 +86,16 @@ class StochasticRegisterTest {
         b = new StochasticRegister("b", 0.5, 20, RegisterPolarity.BIPOLAR);
         out = new StochasticRegister("out", 0, 20, RegisterPolarity.BIPOLAR);
 
-        StochasticRegister.add(out, a, zero, scale);
+        StochasticRegister.add(out, a, zero, scale, 0);
         assertEquals(0.5 * 0.5, out.toDouble(), 0.1);
 
-        StochasticRegister.subtract(out, zero, a, scale);
+        StochasticRegister.subtract(out, zero, a, scale, 0);
         assertEquals((0 - 0.5) * 0.5, out.toDouble(), 0.1);
 
-        StochasticRegister.multiply(out, a, b);
+        StochasticRegister.multiply(out, a, b, 0);
         assertEquals(0.5 * 0.5, out.toDouble(), 0.1);
 
-        StochasticRegister.divide(out, a, b, scale);
+        StochasticRegister.divide(out, a, b, scale, 0);
         assertEquals(0.5 * 0.5 / 0.5, out.toDouble(), 0.1);
     }
 
@@ -109,16 +109,16 @@ class StochasticRegisterTest {
         // Note OUT Reg must be bipolar
         StochasticRegister out = new StochasticRegister("out", 0, 11, RegisterPolarity.BIPOLAR);
 
-        StochasticRegister.add(out, a, zero, scale);
+        StochasticRegister.add(out, a, zero, scale, 0);
         assertEquals(0.5 * 0.5, out.toDouble(), 0.1);
 
-        StochasticRegister.subtract(out, zero, a, scale);
+        StochasticRegister.subtract(out, zero, a, scale, 0);
         assertEquals((0 - 0.5) * 0.5, out.toDouble(), 0.1);
 
-        StochasticRegister.multiply(out, a, b);
+        StochasticRegister.multiply(out, a, b, 0);
         assertEquals(0.5 * 0.5, out.toDouble(), 0.1);
 
-        StochasticRegister.divide(out, a, b, scale);
+        StochasticRegister.divide(out, a, b, scale, 0);
         assertEquals(0.5 * 0.5 / 0.5, out.toDouble(), 0.1);
     }
 }
