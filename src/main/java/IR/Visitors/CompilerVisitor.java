@@ -697,7 +697,7 @@ public class CompilerVisitor implements IRReturnVisitor<List<InstructionNode>> {
         BinaryRegister scaledDownBin = new BinaryRegister(getNextRegisterName());
         conversionIns.add(new BinaryDiv(scaledDownBin, src, scaleFactorReg));
         //convert to stochastic register
-        conversionIns.add(new BinaryToStochasticIns(converted, src));
+        conversionIns.add(new BinaryToStochasticIns(converted, scaledDownBin));
         return conversionIns;
     }
 
