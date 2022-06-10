@@ -34,8 +34,6 @@ public class StochasticRegister implements Register {
 
         //bitSet property is set to our encode method, which returns a bitset class
         this.bitSet = encode(value, frameSize, polarity);
-
-//        System.out.println(this.bitSet);
     }
 
     public StochasticRegister(String name, double value, int frameSize) {
@@ -59,13 +57,8 @@ public class StochasticRegister implements Register {
                            StochasticRegister src2, Register scale) {
         double scaleVal = scale.toDouble();
 
-//        System.out.println(src1.toDouble() + " src1");
-//        System.out.println(src2.toDouble() + " src2");
-
         double destVal = (src1.toDouble() * scaleVal) + ((1 - scaleVal) * src2.toDouble());
-//        System.out.println(destVal + " destVal");
         checkAssignValue(dest, destVal);
-
         addNoise(dest.bitSet, dest.getFrameSize(), NOISE_COEFFICIENT);
     }
 
@@ -107,14 +100,8 @@ public class StochasticRegister implements Register {
         if (!inRange(value, register.getPolarity())) {
             throw new RuntimeException("Register " + register.getName() + " value out of range");
         }
-//        System.out.println(value);
-//        System.out.println(register.getFrameSize());
-//        System.out.println(register.getPolarity());
-
-
 
         register.bitSet = encode(value, register.getFrameSize(), register.getPolarity());
-//        System.out.println(register.bitSet);
     }
 
     private static void saturateAssignValue(StochasticRegister register, double value) {
@@ -215,28 +202,11 @@ public class StochasticRegister implements Register {
         if (polarity == RegisterPolarity.UNIPOLAR) {
             fractionOfOnes = value;
         } else if (polarity == RegisterPolarity.BIPOLAR) {
+
             // (value + 1) / 2
             // so value of -1 corresponds to 0/10 ones set
             // value of 0.4 corresponds to 7/10 ones set
             // value of 1 corresponds to 10/10 ones set
-
-            // value of 0.25 would then correspond to 1.25/2 = 0.625 (will give this value exactly)
-
-            // value of 0.25 corresponds to 1.25/2 = .625
-            // 2 * (.6) - 1 = .2
-            // 2 * (.7) - 1 = .4
-
-            // value of -0.25 corresponds to .75/2 = .375
-            // 2 * (.3) - 1 = -.4
-            // 2 * (.4) - 1 = -.2
-
-            // value of -0.31 corresponds to .345
-            // rounding down works appropriately here for negatives
-            // therefore we can simply round the magnitude of the fraction
-
-            // value of .3 corresponds to .65
-            // 2 * .6 - 1 = .2
-            // 2 * . = .4
 
             fractionOfOnes = (value + 1) / 2;
         } else {
@@ -258,9 +228,6 @@ public class StochasticRegister implements Register {
         ArrayList<Integer> set = new ArrayList<Integer>();
 
         ThreadLocalRandom random = ThreadLocalRandom.current();
-//        System.out.println(fractionOfOnes * frameSize);
-//        System.out.println(fractionOfOnes);
-//        System.out.println(frameSize);
 
         // KEY IDEA we cannot round the fraction since we do not know the frame size
         // EX: If we have 20 as frame size, then it does not make sense to round first decimal
@@ -268,12 +235,8 @@ public class StochasticRegister implements Register {
 
         while (set.size() < Math.round(fractionOfOnes * frameSize)) {
             set.add(free.remove(random.nextInt(free.size())));
-
-            // adding to set, removing from free a random int bounded by the size of free
         }
 
-        // then set is a BitSet with the position of ones described by set
-//        System.out.println(set);
         BitSet ret = new BitSet(frameSize);
         for (Integer i : set) {
             ret.set(i);

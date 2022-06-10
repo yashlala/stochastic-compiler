@@ -148,6 +148,11 @@ class StochasticRegisterTest {
         assertEquals(0.5 * 0.5 / 0.5, out.toDouble(), 0.1);
     }
 
+    @Test
+    void scaledMixed() {
+        BinaryRegister scale = new BinaryRegister("const", 23);
+    }
+
 //    @Test
 //    void mixedMath() {
 //        StochasticRegister zero = new StochasticRegister("zero", 0, 10, RegisterPolarity.UNIPOLAR);
