@@ -9,8 +9,8 @@ public
 class MatMult {
     public List< IRNode > calculateMatMult( Integer N, Integer M, List<Variable> out ){
         DotProduct dotProduct = new DotProduct();
-        Double[][] input_1 = new Double[N][M];
-        Double[][] input_2 = new Double[M][N];
+//        Double[][] input_1 = new Double[N][M];
+//        Double[][] input_2 = new Double[M][N];
         List<IRNode> results = new LinkedList <>();
 
         //initialize both input arrays
@@ -34,12 +34,12 @@ class MatMult {
     }
 
    // uncomment for local testing
-    public static void main(String[] args){
-        List <Variable> res = new LinkedList <>();
-        for(int i=0; i<2; i++)res.add(new Variable("res_"+i));
-        for(IRNode i: new MatMult().calculateMatMult(2,3,res)){
-            System.out.println(i);
-        }
-
-    }
+//    public static void main(String[] args){
+//        List <Variable> res = new LinkedList <>();
+//        for(int i=0; i<2; i++)res.add(new Variable("res_"+i));
+//        for(IRNode i: new MatMult().calculateMatMult(2,3,res)){
+//            System.out.println(i);
+//        }
+//
+//    }
 }
