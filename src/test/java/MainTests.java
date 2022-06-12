@@ -24,15 +24,22 @@ public class MainTests {
 
         // Decide which registers should be stochastic
         // TODO: Salekh, if you get around to it, then put your heuristics here.
-        ImmutableSet<Variable> stochasticVars = getAllVariables(irPrg);
+        Set<Variable> stochasticVars = getAllVariables(irPrg);
+        // Output value must be binary for now due to a compiler<->interpreter interaction bug.
+        // Fix this if we have time; but it isn't as critical as everything else.
+        stochasticVars.remove(out);
 
         // Compile the code to ISA
-        CompilerVisitor compilerVisitor = new CompilerVisitor(
-                stochasticVars, 1000, RegisterPolarity.BIPOLAR, 20);
+        CompilerVisitor compilerVisitor = new CompilerVisitor(ImmutableSet.copyOf(stochasticVars),
+                1000, RegisterPolarity.BIPOLAR, 20);
         List<InstructionNode> isaPrg = compilerVisitor.visitAllInstructions(irPrg);
 
+        for (InstructionNode i : isaPrg) {
+            System.out.println(i);
+        }
+
         // Execute the ISA Program
-        List<String> testOut = ISAInterpreter.getProgramOutput(isaPrg, 0);
+        List<String> testOut = ISAInterpreter.getProgramOutput(isaPrg, 0.001);
 
         // Print the output
         System.out.println(testOut.get(0));
@@ -77,12 +84,12 @@ public class MainTests {
         return sum;
     }
 
-    private static ImmutableSet<Variable> getAllVariables(List<IRNode> prg) {
+    private static Set<Variable> getAllVariables(List<IRNode> prg) {
         RegisterCollectorVisitor rcv = new RegisterCollectorVisitor();
-        return ImmutableSet.copyOf(rcv.visitAllInstructions(prg));
+        return new HashSet<>(rcv.visitAllInstructions(prg));
     }
 
-    private static ImmutableSet<Variable> getNoVariables(List<IRNode> prg) {
-        return ImmutableSet.of(); // Empty immutable set
+    private static Set<Variable> getNoVariables(List<IRNode> prg) {
+        return new HashSet<>();
     }
 }
