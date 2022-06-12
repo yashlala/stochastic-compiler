@@ -26,7 +26,6 @@ class Selector {
                 case 2:
                    results.addAll( advancedFilters.conditionalOriginFilter(instructions));
                    break;
-
                 case 3:
                     results.addAll(advancedFilters.otherOriginFilter(instructions));
                     break;
