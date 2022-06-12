@@ -19,8 +19,6 @@ public class MainTests {
         List<IRNode> irPrg = Workloads.getDotProductIR(x, y, out);
         irPrg.add(new Print(out));
 
-        System.out.println(getRangeOfDoubles(1, 3,1));
-
         // Decide which registers should be stochastic
         // TODO: Use Salekh's code here
         Set<IRNode> stochasticVars = new HashSet<>();
@@ -32,6 +30,8 @@ public class MainTests {
 
         // Execute the ISA Program
         List<String> testOut = ISAInterpreter.getProgramOutput(isaPrg, 0);
+
+        // Print the output
         System.out.println(testOut.get(0));
         System.out.println(dotProduct(x, y));
     }
@@ -65,7 +65,7 @@ public class MainTests {
         return ret;
     }
 
-    public static double dotProduct(List<Double> a, List<Double> b){
+    private static double dotProduct(List<Double> a, List<Double> b){
         double sum = 0;
         for (int i = 0; i < a.size(); i++)
         {
