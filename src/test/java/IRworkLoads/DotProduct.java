@@ -8,6 +8,9 @@ import IR.Variables.Variable;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
+import java.util.ArrayList;
+import java.util.concurrent.ThreadLocalRandom;
+
 
 public
 class DotProduct {
@@ -58,9 +61,11 @@ class DotProduct {
     List<IRNode> init_variables(Double[] input_1, Double[] input_2,Integer N, int index){
         List < IRNode > results = new LinkedList <>();
         Random rand = new Random();
+//        index =0;
         for(int i=index; i<N+index; i++){
-        double d1 = Double.parseDouble(String.format("%.5f" ,rand.nextDouble()));
-        double d2 =  Double.parseDouble(String.format("%.5f" ,rand.nextDouble()));
+        double d1 = this.getRandomDouble(2);
+//        double d2 =  Double.parseDouble(String.format("%.5f" ,rand.nextDouble()));
+        double d2 = this.getRandomDouble(2);
 
         Literal input1_raw = new Literal(d1);
         Literal input2_raw = new Literal(d2);
@@ -97,6 +102,31 @@ class DotProduct {
         System.out.println(dotProductCheck(input_1, input_2));
         return results;
     }
+//    public static List<IRNode> calculateDotProduct(List<Double> x, List<Double> y, Variable output) {
+//        if (x.size() != y.size()) {
+//            throw new RuntimeException("Unequal list lengths");
+//        }
+//
+//        Variable acc = new Variable("acc");
+//        Variable tmp = new Variable("tmp");
+//
+//        List<IRNode> prg = new ArrayList<>();
+//        for (int i=0; i < x.size(); i++) {
+//            prg.add(new SetLiteral(new Variable("x_" + i), new Literal(x.get(i))));
+//            prg.add(new SetLiteral(new Variable("y_" + i), new Literal(y.get(i))));
+//        }
+//
+//        prg.add(new SetLiteral(acc, new Literal(0)));
+//        for (int i=0; i < x.size(); i++) {
+//            prg.add(new Multiply(tmp, new Variable("x_" + i), new Variable("y_" + i)));
+//            prg.add(new Add(acc, acc, tmp));
+//        }
+//
+//        prg.add(new SetLiteral(tmp, new Literal(0)));
+//        prg.add(new Add(output, acc, tmp));
+//
+//        return prg;
+//    }
     public Double dotProductCheck(Double[] a, Double[] b){
         double sum = 0;
         int n = a.length;
@@ -106,7 +136,13 @@ class DotProduct {
         }
         return sum;
     }
+    private Double getRandomDouble( double range) {
+        ThreadLocalRandom rand = ThreadLocalRandom.current();
 
+
+            return (rand.nextDouble() - 0.5) * 2 * range ;
+
+    }
 
     //uncomment for local testing
 //    public static void main(String[] args){

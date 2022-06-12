@@ -46,6 +46,7 @@ class RunTests {
         for(IRNode i: instructions){
             System.out.println(i);
         }
+        System.out.println("\n\n\nIR END HERE\n\n\n");
         Selector selector = new Selector();
         ImmutableSet<Variable> stochVars = ImmutableSet.copyOf(selector.collectAllRegisters(instructions));
         List< InstructionNode > isaInstructions= this.generateISAcode(instructions,scalingFactor,bitWidth, stochVars);
@@ -86,25 +87,25 @@ class RunTests {
         RunTests runTests = new RunTests();
         //Specify the test parameters
         int noiseCoefficient = 10;
-        int scalingFactor = 600;
-        int bitWidth = 32;
-        int N = 2;
-        int M = 2;
+        int scalingFactor = 60000;
+        int bitWidth = 400000;
+        int N = 100;
+        int M = 100;
         int L = 2;
         int kernelDim = 2;
         //Uncomment to run the test for the dotProduct
-        //Specify the register name for the final result to be stored
+//        Specify the register name for the final result to be stored
 //        Variable output = new Variable("output");
 //        runTests.runDotProduct(N,output,bitWidth,scalingFactor,noiseCoefficient);
 
 
         //Uncomment to run the test for matrix marix multiply
         //Specify the register names for the final results to be stored
-//        List<Variable> output = new LinkedList <>();
-//        for(int i=0; i<N;i++){
-//            output.add(new Variable("output_"+i));
-//        }
-//        runTests.runMatMatMult(N,M,output,bitWidth,scalingFactor,noiseCoefficient);
+        List<Variable> output = new LinkedList <>();
+        for(int i=0; i<N;i++){
+            output.add(new Variable("output_"+i));
+        }
+        runTests.runMatMatMult(N,M,output,bitWidth,scalingFactor,noiseCoefficient);
 
 
         //Uncomment to run the test for matrix vect multiply

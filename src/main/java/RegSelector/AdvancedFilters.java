@@ -2,6 +2,8 @@ package RegSelector;
 
 import IR.IRNodes.*;
 import IR.Variables.Variable;
+import IR.Visitors.AssignmentVisitor;
+import IR.Visitors.SideEffectRegisterVisitor;
 import IR.Visitors.TypeVisitor;
 
 import java.util.HashSet;
@@ -72,4 +74,18 @@ class AdvancedFilters {
         Set < Variable > results = new HashSet <>();
         return results;
     }
+
+//    public List<Variable> recursiveSearchOrigin(Variable register, List<IRNode> previousInstructions){
+//
+//            SideEffectRegisterVisitor serv  = new SideEffectRegisterVisitor();
+//            AssignmentVisitor av = new AssignmentVisitor();
+//
+//            if(previousInstructions.size() ==1){
+//                List<Variable> variables = new LinkedList <>();
+//                variables = previousInstructions.get(0).accept(av);
+//                if(variables.get(0).toString() == register.toString()){
+//
+//                }
+//            }
+//    }
 }
