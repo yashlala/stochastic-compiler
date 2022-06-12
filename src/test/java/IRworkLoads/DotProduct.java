@@ -12,26 +12,27 @@ import java.util.Random;
 public
 class DotProduct {
     public
-    List<IRNode> calculateDotProduct(Integer N,Variable output){
+    List<IRNode> calculateDotProduct(Integer N,Variable output, int index){
         List < IRNode > results= new LinkedList <>();
 
         //used to capture random numbers for correctness comparison later
         Double [] input_1 = new Double[N];
         Double [] input_2 = new Double[N];
 
-
-
-
         //use to accumulate intermediate results
         Variable accum = new Variable("accum");
         SetLiteral init_accum = new SetLiteral(accum,new Literal(0.0));
         results.add(init_accum);
         //initialize variables into memory
-        results.addAll(this.init_variables(input_1, input_2, N));
-        System.out.println(results);
+        results.addAll(this.init_variables(input_1, input_2, N,index));
+
+        //uncomment to see intialization code process
+//        System.out.println("********** Generated initialization code :**********");
+//        for(IRNode i:results)System.out.println(i);
+//        System.out.println("********** End of Code **********\n");
 
         //calculate the dot product
-        for(int i=0; i<N; i++){
+        for(int i=index; i<N+index; i++){
             Variable dest1 = new Variable("dest_x_"+i);
             Variable dest2 = new Variable("dest_y_"+i);
             Variable dest_temp = new Variable("temp");
@@ -51,10 +52,10 @@ class DotProduct {
 
     }
 
-    List<IRNode> init_variables(Double[] input_1, Double[] input_2,Integer N){
+    List<IRNode> init_variables(Double[] input_1, Double[] input_2,Integer N, int index){
         List < IRNode > results = new LinkedList <>();
         Random rand = new Random();
-        for(int i=0; i<N; i++){
+        for(int i=index; i<N+index; i++){
         double d1 = rand.nextDouble();
         double d2 = rand.nextDouble();
 
@@ -68,8 +69,8 @@ class DotProduct {
 
         Variable addr1 = new Variable("addr_x_"+i);
         Variable addr2 = new Variable("addr_y_"+i);
-        input_1[i]=d1;
-        input_2[i]=d2;
+        input_1[i-index]=d1;
+        input_2[i-index]=d2;
 
         Store s1  = new Store(addr1,input1);
         Store s2  = new Store(addr2,input2);
@@ -93,8 +94,11 @@ class DotProduct {
         }
         return sum;
     }
-    public static void main(String[] args){
-        System.out.println(new DotProduct().calculateDotProduct(4,new Variable("output")));
-    }
+
+
+    //uncomment for local testing
+//    public static void main(String[] args){
+//        System.out.println(new DotProduct().calculateDotProduct(4,new Variable("output"),0));
+//    }
 
 }
