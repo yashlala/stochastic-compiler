@@ -486,25 +486,48 @@ public class CompilerVisitor implements IRReturnVisitor<List<InstructionNode>> {
     @Override
     public List<InstructionNode> visit(LessThan lessThan) {
         List<InstructionNode> ltIns = new LinkedList<>();
-        Register dest;
+        BinaryRegister dest;
         Register arg1;
         Register arg2;
-        if (stochasticVariables.contains(lessThan.getDest())) {
-            dest = getStochasticRegisterForVar(lessThan.getDest());
+        boolean stochasticSrc1 = stochasticVariables.contains(lessThan.getSrc1());
+        boolean stochasticSrc2 = stochasticVariables.contains(lessThan.getSrc2());
+        boolean stochasticDest = stochasticVariables.contains(lessThan.getDest());
+
+        if (stochasticDest) {
+            dest = new BinaryRegister(getNextRegisterName());
         } else {
             dest = getBinaryRegisterForVar(lessThan.getDest());
         }
-        if (stochasticVariables.contains(lessThan.getSrc1())) {
+        if (stochasticSrc1) {
             arg1 = getStochasticRegisterForVar(lessThan.getSrc1());
         } else {
             arg1 = getBinaryRegisterForVar(lessThan.getSrc1());
         }
-        if (stochasticVariables.contains(lessThan.getSrc2())) {
+        if (stochasticSrc2) {
             arg2 = getStochasticRegisterForVar(lessThan.getSrc2());
         } else {
             arg2 = getBinaryRegisterForVar(lessThan.getSrc2());
         }
-        ltIns.add(new ISA.InstructionNodes.LessThan(dest, arg1, arg2));
+
+        if (stochasticSrc1 && !stochasticSrc2) {
+            StochasticRegister temp2 = new StochasticRegister(getNextRegisterName(), polarity, bitstreamWidth);
+            ltIns.addAll(convertBinarytoStochastic((BinaryRegister) arg2, temp2));
+            ltIns.add(new ISA.InstructionNodes.LessThan(dest, arg1, temp2));
+        } else if (!stochasticSrc1 && stochasticSrc2) {
+            BinaryRegister temp2 = new BinaryRegister(getNextRegisterName());
+            ltIns.addAll(convertStochasticToBinary((StochasticRegister) arg2, temp2));
+            ltIns.add(new ISA.InstructionNodes.LessThan(dest, arg1, temp2));
+        } else {
+            //inputs already have consistent types
+            ltIns.add(new ISA.InstructionNodes.LessThan(dest, arg1, arg2));
+        }
+
+        //if dest is stochastic,need to convert less than output to stochastic
+        //NOTE THIS CODE AVOIDS INTERPRETER BUG BY ONLY HAVING STOCHASTIC LESSTHAN DEST BE BINARY
+        if (stochasticDest) {
+            StochasticRegister realDest = getStochasticRegisterForVar(lessThan.getDest());
+            ltIns.addAll(convertBinarytoStochastic(dest, realDest));
+        }
         return ltIns;
     }
 
