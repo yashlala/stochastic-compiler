@@ -2,6 +2,7 @@ import IR.IRNodes.*;
 import IR.Literals.Literal;
 import IR.Variables.Variable;
 import IR.Visitors.CompilerVisitor;
+import IR.Visitors.RegisterCollectorVisitor;
 import ISA.InstructionNodes.InstructionNode;
 import ISA.Registers.RegisterPolarity;
 import ISAInterpreter.ISAInterpreter;
@@ -22,12 +23,12 @@ public class MainTests {
         irPrg.add(new Print(out));
 
         // Decide which registers should be stochastic
-        // TODO: Use Salekh's code here
-        Set<IRNode> stochasticVars = new HashSet<>();
+        // TODO: Salekh, if you get around to it, then put your heuristics here.
+        ImmutableSet<Variable> stochasticVars = getAllVariables(irPrg);
 
         // Compile the code to ISA
-        CompilerVisitor compilerVisitor = new CompilerVisitor(ImmutableSet.copyOf(new HashSet<>()),
-                1000, RegisterPolarity.BIPOLAR, 20);
+        CompilerVisitor compilerVisitor = new CompilerVisitor(
+                stochasticVars, 1000, RegisterPolarity.BIPOLAR, 20);
         List<InstructionNode> isaPrg = compilerVisitor.visitAllInstructions(irPrg);
 
         // Execute the ISA Program
@@ -74,5 +75,14 @@ public class MainTests {
             sum += a.get(i) * b.get(i);
         }
         return sum;
+    }
+
+    private static ImmutableSet<Variable> getAllVariables(List<IRNode> prg) {
+        RegisterCollectorVisitor rcv = new RegisterCollectorVisitor();
+        return ImmutableSet.copyOf(rcv.visitAllInstructions(prg));
+    }
+
+    private static ImmutableSet<Variable> getNoVariables(List<IRNode> prg) {
+        return ImmutableSet.of(); // Empty immutable set
     }
 }
