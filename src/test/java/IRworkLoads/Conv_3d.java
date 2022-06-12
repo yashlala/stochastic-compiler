@@ -7,11 +7,12 @@ import IR.Variables.Variable;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 
 public
 class Conv_3d {
     //This function initializes the kernel by some random numbers
-
+    int count =1;
     public List<IRNode> initKernel(Integer dim, Double[][][]kernel){
         List<IRNode> results = new LinkedList <>();
         Random rand = new Random();
@@ -26,6 +27,9 @@ class Conv_3d {
                     //example: kernel_1_1_1 = 0.99
                     SetLiteral literal = new SetLiteral(register,new Literal(entry));
                     results.add(literal);
+                    SetLiteral addressInit = new SetLiteral(dest,new Literal(count));
+                    count++;
+                    results.add(addressInit);
                     // example: @kernel_addr_1_1_1 = kernel_1_1_1
                     Store store = new Store(dest,register);
                     results.add(store);
@@ -50,8 +54,15 @@ class Conv_3d {
                     Variable register = new Variable("input_"+i+"_"+j+"_"+k);
                     SetLiteral literal = new SetLiteral(register,new Literal(entry));
                     results.add(literal);
-                    // example: @input_addr_1_1_1  = input_1_1_1
+
                     Variable dest = new Variable("input_addr_"+i+"_"+j+"_"+k);
+
+                    //initi the input-addr , example: input_addr_1_1_1 =1
+                    SetLiteral initInputAddr = new SetLiteral(dest,new Literal(count));
+                    count++;
+                    results.add(initInputAddr);
+                    // example: @input_addr_1_1_1  = input_1_1_1
+
                     Store store = new Store(dest,register);
                     results.add(store);
                 }
@@ -115,6 +126,10 @@ class Conv_3d {
                 }
             }
         }
+        //init the output address, ex: output_1_1_1 = 1
+        SetLiteral initOutAddr = new SetLiteral(output,new Literal(count));
+        count++;
+        results.add(initOutAddr);
         Store store = new Store(output,new Variable("accum"));
         results.add(store);
     return  results;

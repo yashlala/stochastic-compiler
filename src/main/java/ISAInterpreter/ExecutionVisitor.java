@@ -156,7 +156,15 @@ public class ExecutionVisitor implements ISAVisitor {
         StochasticRegister src2 = regFile.getStochasticReg(stochasticDiv.getSrc2());
         Register scale = regFile.getReg(stochasticDiv.getScale());
         StochasticRegister dest = new StochasticRegister(stochasticDiv.getDest());
+//        System.out.println("\n\n\n offending instructions \n\n");
+//        System.out.println(dest);
+//        System.out.println(src1);
+//        System.out.println(src2);
+//        System.out.println("\n\n\n scale \n\n");
+
+        System.out.println(scale);
         StochasticRegister.divide(dest, src1, src2, scale, noiseCoefficient);
+//        System.out.println("\n\n\n no problem \n\n");
         regFile.putReg(dest);
     }
 

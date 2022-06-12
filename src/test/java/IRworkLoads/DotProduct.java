@@ -59,8 +59,8 @@ class DotProduct {
         List < IRNode > results = new LinkedList <>();
         Random rand = new Random();
         for(int i=index; i<N+index; i++){
-        double d1 = rand.nextDouble();
-        double d2 = rand.nextDouble();
+        double d1 = Double.parseDouble(String.format("%.5f" ,rand.nextDouble()));
+        double d2 =  Double.parseDouble(String.format("%.5f" ,rand.nextDouble()));
 
         Literal input1_raw = new Literal(d1);
         Literal input2_raw = new Literal(d2);
