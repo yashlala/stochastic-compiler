@@ -176,4 +176,8 @@ class Conv_3d {
         }
     }
 
+//    public Double convolutionReferenceImplentation(Double[][][]input, Double[][][] kernel, Double[][]][]output){
+//
+//    }
+
 }

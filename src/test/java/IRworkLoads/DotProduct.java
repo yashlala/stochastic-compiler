@@ -11,8 +11,9 @@ import java.util.Random;
 
 public
 class DotProduct {
+    int counter =1;
     public
-    List<IRNode> calculateDotProduct(Integer N,Variable output, int index){
+    List<IRNode> calculateDotProduct(Integer N, Variable output, int index){
         List < IRNode > results= new LinkedList <>();
 
         //used to capture random numbers for correctness comparison later
@@ -46,6 +47,8 @@ class DotProduct {
             results.add(mult);
             results.add(add);
         }
+        SetLiteral setOutput = new SetLiteral(output,new Literal(counter));
+        results.add(setOutput);
         Store store_result = new Store(output,accum);
         results.add(store_result);
         return results;
@@ -68,7 +71,14 @@ class DotProduct {
         SetLiteral setinput2 = new SetLiteral(input2,input2_raw);
 
         Variable addr1 = new Variable("addr_x_"+i);
+        SetLiteral setliteral1 = new SetLiteral(addr1,new Literal(counter));
+        counter++;
+
         Variable addr2 = new Variable("addr_y_"+i);
+        SetLiteral setliteral2 = new SetLiteral(addr2,new Literal(counter));
+        counter++;
+
+
         input_1[i-index]=d1;
         input_2[i-index]=d2;
 
@@ -76,12 +86,14 @@ class DotProduct {
         Store s2  = new Store(addr2,input2);
 
         results.add(setinput1);
+        results.add(setliteral1);
         results.add(s1);
         results.add(setinput2);
+        results.add(setliteral2);
         results.add(s2);
 
         }
-        System.out.println("Correct dot product is: ");
+        System.out.println("************Correct dot product is: ************");
         System.out.println(dotProductCheck(input_1, input_2));
         return results;
     }
