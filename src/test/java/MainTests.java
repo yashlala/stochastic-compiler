@@ -29,16 +29,17 @@ public class MainTests {
         try {
             FileWriter fw = new FileWriter("/home/lala/io/data.csv", true);
             BufferedWriter bw = new BufferedWriter(fw);
-            bw.write("frame_size,scale_factor,noise_coefficient,relative_err\n");
+            bw.write("frame_size,scale_factor,noise_coefficient,avg_relative_abs_err\n");
             for (int frameSize = 20; frameSize < 1000; frameSize += 10) {
-                int scaleFactor = frameSize / 5;
-                for (double noiseCoefficient = 0; noiseCoefficient < 1; noiseCoefficient += 0.01) {
-                    TestOutput out = testDotProduct(frameSize, scaleFactor, noiseCoefficient);
-                    double err = (double) out.delta / out.expected;
-
-                    bw.write("" + frameSize + "," + scaleFactor + "," + noiseCoefficient + "," + err);
+                for (int scaleFactor = 10; scaleFactor < frameSize; scaleFactor += 10) {
+                    double errorAccumulator = 0;
+                    for (int trial=0; trial < 3; trial++) {
+                        TestOutput out = testDotProduct(frameSize, scaleFactor, 0.05);
+                        errorAccumulator += Math.abs((double) out.delta / out.expected);
+                    }
+                    double avgErrorMagnitude = errorAccumulator / 3;
+                    bw.write("" + frameSize + "," + scaleFactor + "," + 0.05 + "," + avgErrorMagnitude);
                     bw.newLine();
-
                 }
             }
             bw.close();
@@ -50,8 +51,8 @@ public class MainTests {
     private static TestOutput testDotProduct(int frameSize, int scaleFactor, double noiseCoefficient) {
         // Generate the IR code for the dot product
         Variable out = new Variable("out");
-        List<Double> x = getRangeOfDoubles(1, 3,0.3);
-        List<Double> y = getRangeOfDoubles(1, 3, 0.3);
+        List<Double> x = getRandomDoubles(5, 4);
+        List<Double> y = getRandomDoubles(5, 4);
         List<IRNode> irPrg = Workloads.getDotProductIR(x, y, out);
         irPrg.add(new Print(out));
 
