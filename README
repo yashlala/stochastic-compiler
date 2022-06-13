@@ -1,0 +1,8 @@
+CS259 Final Project 
+Neil, Yash, Brandon, Salekh
+
+This is the latest stable version of our compiler.
+
+All heuristic testing code has some conflicts with our main code, so it has not been added to the tarball. 
+If you would like to see the heuristic testing, please visit https://github.com/yashlala/stochastic-compiler.git, and 
+checkout branch "salekh".
