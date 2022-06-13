@@ -8,17 +8,50 @@ import ISA.Registers.RegisterPolarity;
 import ISAInterpreter.ISAInterpreter;
 import Workloads.Workloads;
 import com.google.common.collect.ImmutableSet;
+import lombok.RequiredArgsConstructor;
 
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class MainTests {
+    @RequiredArgsConstructor
+    static class TestOutput {
+        final double expected;
+        final double observed;
+        final double delta;
+    }
+
     public static void main(String[] args) {
+        try {
+            FileWriter fw = new FileWriter("/home/lala/io/data.csv", true);
+            BufferedWriter bw = new BufferedWriter(fw);
+            bw.write("frame_size,scale_factor,noise_coefficient,relative_err\n");
+            for (int frameSize = 20; frameSize < 1000; frameSize += 10) {
+                int scaleFactor = frameSize / 5;
+                for (double noiseCoefficient = 0; noiseCoefficient < 1; noiseCoefficient += 0.01) {
+                    TestOutput out = testDotProduct(frameSize, scaleFactor, noiseCoefficient);
+                    double err = (double) out.delta / out.expected;
+
+                    bw.write("" + frameSize + "," + scaleFactor + "," + noiseCoefficient + "," + err);
+                    bw.newLine();
+
+                }
+            }
+            bw.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static TestOutput testDotProduct(int frameSize, int scaleFactor, double noiseCoefficient) {
         // Generate the IR code for the dot product
         Variable out = new Variable("out");
-        List<Double> x = getRangeOfDoubles(1, 3,0.5);
-        List<Double> y = getRangeOfDoubles(1, 3, 0.5);
+        List<Double> x = getRangeOfDoubles(1, 3,0.3);
+        List<Double> y = getRangeOfDoubles(1, 3, 0.3);
         List<IRNode> irPrg = Workloads.getDotProductIR(x, y, out);
         irPrg.add(new Print(out));
 
@@ -31,19 +64,13 @@ public class MainTests {
 
         // Compile the code to ISA
         CompilerVisitor compilerVisitor = new CompilerVisitor(ImmutableSet.copyOf(stochasticVars),
-                1000, RegisterPolarity.BIPOLAR, 20);
+                frameSize, RegisterPolarity.BIPOLAR, scaleFactor);
         List<InstructionNode> isaPrg = compilerVisitor.visitAllInstructions(irPrg);
 
-        for (InstructionNode i : isaPrg) {
-            System.out.println(i);
-        }
-
         // Execute the ISA Program
-        List<String> testOut = ISAInterpreter.getProgramOutput(isaPrg, 0.001);
+        List<Double> testOut = toDoubles(ISAInterpreter.getProgramOutput(isaPrg, noiseCoefficient));
 
-        // Print the output
-        System.out.println(testOut.get(0));
-        System.out.println(dotProduct(x, y));
+        return new TestOutput(dotProduct(x, y), testOut.get(0), dotProduct(x, y) - testOut.get(0));
     }
 
     private static List<Double> getRandomDoubles(int count, double range) {
@@ -91,5 +118,14 @@ public class MainTests {
 
     private static Set<Variable> getNoVariables(List<IRNode> prg) {
         return new HashSet<>();
+    }
+
+    private static List<Double> toDoubles(List<String> output) {
+        List<Double> ret = new ArrayList<>();
+        for (String s : output) {
+            String[] parts = s.split(" ");
+            ret.add(Double.parseDouble(parts[2]));
+        }
+        return ret;
     }
 }
