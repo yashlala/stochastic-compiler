@@ -18,74 +18,140 @@ class AdvancedFilters {
     public
     Set < Variable > conditionalOriginFilter ( List < IRNode > instructions ) {
         TypeVisitor tv = new TypeVisitor();
-        Set < Variable > results = new HashSet <>();
+        Set < Variable > variableList = new HashSet <>();
         int index = 0;
             for(IRNode i: instructions){
-                index++;
-                List variableList = new LinkedList<Variable>();
                 switch (i.accept(tv)){
                     case "LessThan":
-                        variableList.add( ((LessThan)i).getSrc1());
-                        variableList.add( ((LessThan)i).getSrc2());
-                        variableList.add( ((LessThan)i).getDest());
-
-                       results.addAll( this.findOccurrence(instructions,variableList,index));
+                        variableList.addAll( this.recursiveSearchOrigin( ((LessThan)i).getSrc1(),getSublist(0,index,instructions)));
+                        variableList.addAll( this.recursiveSearchOrigin( ((LessThan)i).getSrc2(),getSublist(0,index,instructions)));
                         break;
                     case "Equals":
-                        variableList.add( ((Equals)i).getSrc1());
-                        variableList.add( ((Equals)i).getSrc2());
-                        variableList.add( ((Equals)i).getDest());
-                        results.addAll( this.findOccurrence(instructions,variableList,index));
+                        variableList.addAll( this.recursiveSearchOrigin( ((Equals)i).getSrc1(),getSublist(0,index,instructions)));
+                        variableList.addAll( this.recursiveSearchOrigin( ((Equals)i).getSrc2(),getSublist(0,index,instructions)));
                         break;
                     case "IfZero":
                         //TODO: confirm if condition is a register or actual condition
-                        variableList.add( ((IfZero)i).getCondition());
-                        results.addAll( this.findOccurrence(instructions,variableList,index));
+                        variableList.addAll( this.recursiveSearchOrigin( ((IfZero)i).getCondition(),getSublist(0,index,instructions)));
                         break;
-
                     case "IfNotEquals":
-                        variableList.add ( ((IfNotEquals)i).getCond1());
-                        variableList.add( ((IfNotEquals)i).getCond2());
-                        results.addAll( this.findOccurrence(instructions,variableList,index));
+                        variableList.addAll( this.recursiveSearchOrigin( ((IfNotEquals)i).getCond1(),getSublist(0,index,instructions)));
+                        variableList.addAll( this.recursiveSearchOrigin( ((IfNotEquals)i).getCond2(),getSublist(0,index,instructions)));
                         break;
                 }
+                index++;
             }
 
+        return variableList;
+    }
+    public
+    Set < Variable > loadStoreOriginFilter( List < IRNode > instructions  ){
+        TypeVisitor tv = new TypeVisitor();
+        Set < Variable > results = new HashSet <>();
+        int index = 0;
+        for(IRNode i: instructions){
+            if (i.accept(tv).equals("Load") ){
+                results.addAll( this.recursiveSearchOrigin( ((Load)i).getAddress(),getSublist(0,index,instructions)));
+
+            }else if(i.accept(tv).equals("Store" )){
+                results.addAll( this.recursiveSearchOrigin( ((Store)i).getAddress(),getSublist(0,index,instructions)));
+
+            }
+            index++;
+        }
         return results;
     }
     public
-    List<IRNode> findOccurrence(List < IRNode > instructions, List<Variable> variables, Integer index){
+    Set < Variable > loopOriginFilter( List < IRNode > instructions,Boolean ifBasic,Boolean ifAdvanced, int advanced ) {
         TypeVisitor tv = new TypeVisitor();
-        List< IRNode > results = new LinkedList <>();
-        for(Variable v: variables){
-            for (int i = index; i<instructions.size()-1; i++) {
-                if (instructions.get(i).accept(tv).equals("Divide")) {
-//                results.add(((Divide) i).getSrc2());
-                }
+        Set < Variable > results = new HashSet <>();
+        int index=0;
+        for (IRNode i : instructions) {
+            if (i.accept(tv).equals("ForLoop")) {
+                results.addAll( this.recursiveSearchOrigin( ((ForLoop)i).getLoopRangeStart(),getSublist(0,index,instructions)));
+                results.addAll( this.recursiveSearchOrigin( ((ForLoop)i).getLoopRangeEnd(),getSublist(0,index,instructions)));
+                Selector sl = new Selector();
+                List<IRNode> sublist = getSublist(0,index-1,instructions);
+                sublist.addAll(((ForLoop) i).getContents());
+                    results.addAll(sl.returnBinaryRegisters( sublist,ifBasic,ifAdvanced,advanced ));
             }
+            index++;
+        }
+        return results;
+    }
+    public
+    Set < Variable > printOriginFilter( List < IRNode > instructions  ){
+        TypeVisitor tv = new TypeVisitor();
+        Set < Variable > results = new HashSet <>();
+        int index=0;
+        for (IRNode i : instructions) {
+            if (i.accept(tv).equals("Print")) {
+                results.addAll( this.recursiveSearchOrigin( ((Print)i).getVar(),getSublist(0,index,instructions)));
+            }
+            index++;
         }
 
         return results;
     }
-
     public
-    Set < Variable > otherOriginFilter ( List < IRNode > instructions ) {
+    Set < Variable > divideOriginFilter ( List < IRNode > instructions ) {
         TypeVisitor tv = new TypeVisitor();
         Set < Variable > results = new HashSet <>();
+        int index=0;
+        for (IRNode i : instructions) {
+            if (i.accept(tv).equals("Divide")) {
+                results.addAll( this.recursiveSearchOrigin( ((Divide)i).getSrc2(),getSublist(0,index,instructions)));
+            }
+            index++;
+        }
         return results;
     }
+    public
+    Set < Variable > applyAllOriginFilters ( List < IRNode > instructions, Boolean ifBasic, Boolean ifAdvaced, int advanced ) {
+        Set < Variable > results = new HashSet <>();
+        results.addAll(this.conditionalOriginFilter(instructions));
+        results.addAll(this.loopOriginFilter(instructions,ifBasic, ifAdvaced, advanced));
+        results.addAll(this.loadStoreOriginFilter(instructions));
+        results.addAll(this.divideOriginFilter(instructions));
+        results.addAll(this.printOriginFilter(instructions));
 
-//    public List<Variable> recursiveSearchOrigin(Variable register, List<IRNode> previousInstructions){
-//
-//            SideEffectRegisterVisitor serv  = new SideEffectRegisterVisitor();
-//            AssignmentVisitor av = new AssignmentVisitor();
-//
-//            if(previousInstructions.size() ==1){
-//                List<Variable> variables = new LinkedList <>();
-//                variables = previousInstructions.get(0).accept(av);
-//                if(variables.get(0).toString() == register.toString()){
-//
-//                }
-//            }
-//    }
+        return results;
+
+    }
+    public List<IRNode>getSublist(int start, int end, List<IRNode> fullList){
+        List<IRNode> subList = new LinkedList <>();
+        for (int i = start; i <= end; i++) {
+            subList.add(fullList.get(i));
+        }
+        return  subList;
+    }
+
+
+
+    public List<Variable> recursiveSearchOrigin(Variable register, List<IRNode> previousInstructions){
+
+
+            List<Variable> result= new LinkedList <>();
+            if(previousInstructions.size() == 0){
+                return result;
+            }
+            SideEffectRegisterVisitor serv  = new SideEffectRegisterVisitor();
+            AssignmentVisitor av = new AssignmentVisitor();
+            IRNode currentInstr = previousInstructions.get(previousInstructions.size()-1);
+
+
+            previousInstructions.remove(previousInstructions.size()-1);
+            if( currentInstr.accept(av).size()>0 && currentInstr.accept(av).get(0).toString() == register.toString()){
+
+                result.addAll(currentInstr.accept(serv));
+                for(Variable i: currentInstr.accept(serv)){
+                    result.addAll(recursiveSearchOrigin(i,previousInstructions));
+                }
+
+            }else {
+                result.addAll(recursiveSearchOrigin(register,previousInstructions));
+            }
+        return  result;
+
+    }
 }

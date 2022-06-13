@@ -27,7 +27,7 @@ class RegisterCollectorVisitor implements IRReturnVisitor<List<Variable>> {
         result.add(forLoop.getLoopRangeEnd());
         RegisterCollectorVisitor rcv = new RegisterCollectorVisitor();
         for(IRNode i: forLoop.getContents()){
-            System.out.println(i.accept(rcv));
+
 
            result.addAll( i.accept(rcv));
         }

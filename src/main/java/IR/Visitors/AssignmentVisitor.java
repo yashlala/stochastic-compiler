@@ -25,7 +25,7 @@ class AssignmentVisitor implements IRReturnVisitor<List<Variable>> {
 
         RegisterCollectorVisitor rcv = new RegisterCollectorVisitor();
         for(IRNode i: forLoop.getContents()){
-            System.out.println(i.accept(rcv));
+
 
             result.addAll( i.accept(rcv));
         }
@@ -76,6 +76,7 @@ class AssignmentVisitor implements IRReturnVisitor<List<Variable>> {
 
     @Override
     public List<Variable> visit(IfZero ifZero) {
+
         List<Variable> result = new LinkedList <>();
         return  result;
     }
