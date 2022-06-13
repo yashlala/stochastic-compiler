@@ -28,36 +28,35 @@ public class MainTests {
     }
 
     public static void main(String[] args) {
-//        try {
-//            FileWriter fw = new FileWriter("/Users/salekhparkhati/ucla/code/cs259/stochastic-compiler/src/salekh_data_dot.csv", true);
-//            BufferedWriter bw = new BufferedWriter(fw);
-////            bw.write("filterFactor, frame_size,scale_factor,noise_coefficient,relative_err\n");
-//            bw.write("filterFactor,frame_size,scale_factor,noise_coefficient,avg_relative_abs_err\n");
-//            int filterfactor = 1;
-//            for (int frameSize = 20; frameSize < 1000; frameSize += 10) {
-//                for (int scaleFactor = 10; scaleFactor < frameSize; scaleFactor += 10) {
-//                    double errorAccumulator = 0;
-//                    for (int trial=0; trial < 3; trial++) {
-//                        TestOutput out = testDotProduct(frameSize, scaleFactor, 0.01);
-//                        errorAccumulator += Math.abs((double) out.delta / out.expected);
-//                    }
-//                    double avgErrorMagnitude = errorAccumulator / 3;
-//                    bw.write("" +filterfactor+ "," +frameSize + "," + scaleFactor + "," + 0.01 + "," + avgErrorMagnitude);
-//                    bw.newLine();
-//                }
-//            }
-//            bw.close();
-//        } catch (IOException e) {
-//            throw new RuntimeException(e);
-//        }
-        runMatMatMultTest();
+        try {
+            FileWriter fw = new FileWriter("/home/lala/io/data.csv", true);
+            BufferedWriter bw = new BufferedWriter(fw);
+            bw.write("frame_size,scale_factor,noise_coefficient,avg_relative_abs_err\n");
+            for (int frameSize = 20; frameSize < 1000; frameSize += 10) {
+                for (int scaleFactor = 10; scaleFactor < frameSize; scaleFactor += 10) {
+                    double errorAccumulator = 0;
+                    for (int trial=0; trial < 3; trial++) {
+                        TestOutput out = testDotProduct(frameSize, scaleFactor, 0.05);
+                        errorAccumulator += Math.abs((double) out.delta / out.expected);
+                    }
+                    double avgErrorMagnitude = errorAccumulator / 3;
+                    bw.write("" + frameSize + "," + scaleFactor + "," + 0.05 + "," + avgErrorMagnitude);
+                    bw.newLine();
+                }
+            }
+            bw.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+      //Runs the matrix multiple tests (Salekh)
+      runMatMatMultTest();
     }
 
     private static TestOutput testDotProduct(int frameSize, int scaleFactor, double noiseCoefficient) {
         // Generate the IR code for the dot product
         Variable out = new Variable("out");
-        List<Double> x = getRangeOfDoubles(1, 3,0.3);
-        List<Double> y = getRangeOfDoubles(1, 3, 0.3);
+        List<Double> x = getRandomDoubles(5, 4);
+        List<Double> y = getRandomDoubles(5, 4);
         List<IRNode> irPrg = Workloads.getDotProductIR(x, y, out);
         irPrg.add(new Print(out));
         Integer advanced = 1;
