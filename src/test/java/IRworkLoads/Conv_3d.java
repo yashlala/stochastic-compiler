@@ -169,27 +169,27 @@ class Conv_3d {
 
 
     // uncomment for local testing
-    public static void main(String[] args) {
-        List < Variable > res = new LinkedList <>();
-        Integer N = 3;
-        Integer M = 3;
-        Integer L = 3;
-        Integer kernelDim = 2;
+//    public static void main(String[] args) {
+//        List < Variable > res = new LinkedList <>();
+//        Integer N = 3;
+//        Integer M = 3;
+//        Integer L = 3;
+//        Integer kernelDim = 2;
+//
+//        Variable[][][] output = new Variable[N - kernelDim + 1][M - kernelDim + 1][L - kernelDim + 1];
+//        for (int i = 0; i < N - kernelDim + 1; i++) {
+//            for (int j = 0; j < M - kernelDim + 1; j++) {
+//                for (int k = 0; k < L - kernelDim + 1; k++) {
+//                    output[i][j][k]=new Variable("output_" + i + "_" + j + "_" + k);
+//                }
+//            }
+//        }
 
-        Variable[][][] output = new Variable[N - kernelDim + 1][M - kernelDim + 1][L - kernelDim + 1];
-        for (int i = 0; i < N - kernelDim + 1; i++) {
-            for (int j = 0; j < M - kernelDim + 1; j++) {
-                for (int k = 0; k < L - kernelDim + 1; k++) {
-                    output[i][j][k]=new Variable("output_" + i + "_" + j + "_" + k);
-                }
-            }
-        }
 
-
-        for (IRNode i : new Conv_3d().fullConvolution(N, M, L, kernelDim, output)) {
-            System.out.println(i);
-        }
-    }
+//        for (IRNode i : new Conv_3d().fullConvolution(N, M, L, kernelDim, output)) {
+//            System.out.println(i);
+//        }
+ //   }
 
 //    public Double convolutionReferenceImplentation(Double[][][]input, Double[][][] kernel, Double[][]][]output){
 //

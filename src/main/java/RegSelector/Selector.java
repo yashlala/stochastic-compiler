@@ -17,14 +17,12 @@ class Selector {
         hashSet.addAll(registers);
         return hashSet;
     }
-    public
+    public static
     Set < Variable > returnBinaryRegisters ( List < IRNode > instructions, Boolean ifBasic, Boolean ifAdvanced, Integer  advanced ) {
         Set < Variable > results = new HashSet <>();
         BasicFilters basicFilters = new BasicFilters();
         results = basicFilters.allBasicFilters(instructions);
-//        if(ifBasic){
-//            return results;
-//        }
+
         if(ifAdvanced){
 
             AdvancedFilters advancedFilters = new AdvancedFilters();
@@ -32,22 +30,30 @@ class Selector {
             switch (advanced){
                 case 1:
                     results.addAll( advancedFilters.conditionalOriginFilter(instructions));
+                    results.addAll( advancedFilters.printOriginFilter(instructions));
+
                     break;
                 case 2:
                     results.addAll( advancedFilters.conditionalOriginFilter(instructions));
                     results.addAll( advancedFilters.loopOriginFilter(instructions,ifBasic,ifAdvanced,advanced));
+                    results.addAll( advancedFilters.printOriginFilter(instructions));
+
                     break;
                 case 3:
                     results.addAll( advancedFilters.conditionalOriginFilter(instructions));
                     results.addAll( advancedFilters.loopOriginFilter(instructions,ifBasic,ifAdvanced,advanced));
-                    results.addAll(advancedFilters.loadStoreOriginFilter(instructions));
+                    results.addAll( advancedFilters.loadStoreOriginFilter(instructions));
+                    results.addAll( advancedFilters.printOriginFilter(instructions));
+
                     break;
 
                 case 4:
                     results.addAll( advancedFilters.conditionalOriginFilter(instructions));
                     results.addAll( advancedFilters.loopOriginFilter(instructions,ifBasic,ifAdvanced,advanced));
-                    results.addAll(advancedFilters.loadStoreOriginFilter(instructions));
-                    results.addAll(advancedFilters.divideOriginFilter(instructions));
+                    results.addAll( advancedFilters.loadStoreOriginFilter(instructions));
+                    results.addAll( advancedFilters.divideOriginFilter(instructions));
+                    results.addAll( advancedFilters.printOriginFilter(instructions));
+
                     break;
                 case 5:
 
@@ -61,8 +67,7 @@ class Selector {
     }
     public Set < Variable > returnStochRegisters(Set<Variable>binaryRegs, List<IRNode> instructions){
         HashSet<Variable> result =(HashSet) this.collectAllRegisters(instructions);
-//        System.out.println("all the registers:");
-//        System.out.println(result);
+
         result.removeAll(binaryRegs);
         return result;
     }
@@ -119,11 +124,7 @@ class Selector {
 //        instructions.add(new Divide(generateVariable(),generateVariable(),generateVariable()));
 
 
-        System.out.println("\n******* Beginning Of Test Code ********\n");
-        for (IRNode element : instructions) {
-            System.out.println(element);
-        }
-        System.out.println("\n******* End Of Test Code ********\n");
+
         return instructions;
     }
 
@@ -131,20 +132,10 @@ class Selector {
     public static
     void main ( String[] args ) {
         Selector rs = new Selector();
-//        rs.collectAllRegisters(generateTest());
         List<IRNode> instructions = rs.generateTest();
         Set result = rs.returnStochRegisters(rs.returnBinaryRegisters(instructions,true,true,5),instructions);
 
-        System.out.println("stochastic registers:");
-        System.out.println(result);
 
-
-//
-//        this.collectAllRegisters(generateTest());
-//        System.out.println("all the registers:");
-//        System.out.println(registers);
-//        System.out.println(registers.size());
-//       System.out.println( new Selector().returnBinaryRegisters(generateTest(), false,true,2));
     }
 
 }

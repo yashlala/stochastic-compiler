@@ -11,9 +11,9 @@ class MatVectMult {
     public List< IRNode >calculateMatVectMult ( Integer N, Integer M, List< Variable > output){
         List<IRNode> results = new LinkedList <>();
         DotProduct dotProduct = new DotProduct();
-        for(int i=0; i<N; i++){
-            results.addAll(dotProduct.calculateDotProduct(M,output.get(i),i*M));
-        }
+//        for(int i=0; i<N; i++){
+//                dotProduct.getDotProductIR()
+//        }
         return results;
 
     }

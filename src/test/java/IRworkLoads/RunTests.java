@@ -29,24 +29,15 @@ class RunTests {
         List< IRNode > instructions = new LinkedList<>();
         MatVectMult matVectMult = new MatVectMult();
         instructions = matVectMult.calculateMatVectMult(N,M,output);
-        System.out.println("\n\nGenerated IR\n\n");
-        for(IRNode i: instructions){
-            System.out.println(i);
-        }
+
         Selector selector = new Selector();
         ImmutableSet<Variable> stochVars = ImmutableSet.copyOf(selector.collectAllRegisters(instructions));
         List< InstructionNode > isaInstructions= this.generateISAcode(instructions,scalingFactor,bitWidth, stochVars);
         this.executeISAcode(isaInstructions,noiseCoefficient);
     }
-    public void runMatMatMult(Integer N, Integer M, List<Variable> output,int bitWidth, int scalingFactor,int noiseCoefficient){
+    public void runMatMatMult(Integer N, Integer M, List<Variable> output,int bitWidth, int scalingFactor,double noiseCoefficient){
         List< IRNode > instructions = new LinkedList<>();
         MatMult matMult = new MatMult();
-        instructions = matMult.calculateMatMult(N,M,output);
-        System.out.println("\n\n\nGenerated IR\n\n\n");
-        for(IRNode i: instructions){
-            System.out.println(i);
-        }
-        System.out.println("\n\n\nIR END HERE\n\n\n");
         Selector selector = new Selector();
         ImmutableSet<Variable> stochVars = ImmutableSet.copyOf(selector.collectAllRegisters(instructions));
         List< InstructionNode > isaInstructions= this.generateISAcode(instructions,scalingFactor,bitWidth, stochVars);
@@ -56,10 +47,7 @@ class RunTests {
         List< IRNode > instructions = new LinkedList<>();
         Conv_3d conv_3d = new Conv_3d();
         instructions = conv_3d.fullConvolution(N,M,L,kernelDim,output);
-        System.out.println("\n\n\nGenerated IR\n\n\n");
-        for(IRNode i: instructions){
-            System.out.println(i);
-        }
+
         Selector selector = new Selector();
         ImmutableSet<Variable> stochVars = ImmutableSet.copyOf(selector.collectAllRegisters(instructions));
         List< InstructionNode > isaInstructions= this.generateISAcode(instructions,scalingFactor,bitWidth, stochVars);
@@ -68,29 +56,44 @@ class RunTests {
     public List< InstructionNode > generateISAcode(List<IRNode> instructions, int scalingFactor, int bitWidth, ImmutableSet <Variable> stochVars){
         List< InstructionNode > isaInstructions = new ArrayList <>();
         CompilerVisitor cv = new CompilerVisitor(stochVars, bitWidth, RegisterPolarity.BIPOLAR, scalingFactor);
-//        System.out.println("\n\npassed in ir nodes are");
-//        System.out.println(instructions);
+
         isaInstructions.addAll(cv.visitAllInstructions(instructions));
         return isaInstructions;
     }
-    public void executeISAcode(List< InstructionNode > instructions,int noiseCoefficient){
+    public void executeISAcode(List< InstructionNode > instructions,double noiseCoefficient){
          ISAInterpreter isaIP = new ISAInterpreter();
 
-         for(String i:isaIP.getProgramOutput(instructions,noiseCoefficient)){
-             System.out.println("Final results are");
-             System.out.println(i);
-         }
 
+
+    }
+    private static List<Double> getRangeOfDoubles(double start, double end, double step) {
+        List<Double> ret = new ArrayList<>();
+
+        if (step == 0) {
+            return ret;
+        }
+        if (step > 0) {
+            while (start < end) {
+                ret.add(start);
+                start += step;
+            }
+        } else {
+            while (start > end) {
+                ret.add(start);
+                start += step;
+            }
+        }
+        return ret;
     }
     public static void main(String[] args){
         List< IRNode > instructions = new LinkedList<>();
         RunTests runTests = new RunTests();
         //Specify the test parameters
         int noiseCoefficient = 10;
-        int scalingFactor = 60000;
-        int bitWidth = 400000;
-        int N = 100;
-        int M = 100;
+        int scalingFactor = 6000;
+        int bitWidth = 40000;
+        int N = 50;
+        int M = 50;
         int L = 2;
         int kernelDim = 2;
         //Uncomment to run the test for the dotProduct

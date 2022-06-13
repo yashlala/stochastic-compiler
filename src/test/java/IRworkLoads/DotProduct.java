@@ -30,10 +30,6 @@ class DotProduct {
         //initialize variables into memory
         results.addAll(this.init_variables(input_1, input_2, N,index));
 
-        //uncomment to see intialization code process
-//        System.out.println("********** Generated initialization code :**********");
-//        for(IRNode i:results)System.out.println(i);
-//        System.out.println("********** End of Code **********\n");
 
         //calculate the dot product
         for(int i=index; i<N+index; i++){
@@ -98,8 +94,7 @@ class DotProduct {
         results.add(s2);
 
         }
-        System.out.println("************Correct dot product is: ************");
-        System.out.println(dotProductCheck(input_1, input_2));
+
         return results;
     }
 //    public static List<IRNode> calculateDotProduct(List<Double> x, List<Double> y, Variable output) {
@@ -142,6 +137,31 @@ class DotProduct {
 
             return (rand.nextDouble() - 0.5) * 2 * range ;
 
+    }
+    public static List<IRNode> getDotProductIR(List<Double> x, List<Double> y, Variable output) {
+        if (x.size() != y.size()) {
+            throw new RuntimeException("Unequal list lengths");
+        }
+
+        Variable acc = new Variable("acc");
+        Variable tmp = new Variable("tmp");
+
+        List<IRNode> prg = new ArrayList<>();
+        for (int i=0; i < x.size(); i++) {
+            prg.add(new SetLiteral(new Variable("x_" + i), new Literal(x.get(i))));
+            prg.add(new SetLiteral(new Variable("y_" + i), new Literal(y.get(i))));
+        }
+
+        prg.add(new SetLiteral(acc, new Literal(0)));
+        for (int i=0; i < x.size(); i++) {
+            prg.add(new Multiply(tmp, new Variable("x_" + i), new Variable("y_" + i)));
+            prg.add(new Add(acc, acc, tmp));
+        }
+
+        prg.add(new SetLiteral(tmp, new Literal(0)));
+        prg.add(new Add(output, acc, tmp));
+
+        return prg;
     }
 
     //uncomment for local testing
